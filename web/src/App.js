@@ -1,27 +1,38 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import SelectCoin from './CoinManagement'
+import ComboBox from './CoinManagement';
+import { Container, Row, Col } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import TextField from '@material-ui/core/TextField';
 function App() {
-  let bitcoinLogo = 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <img src={bitcoinLogo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <SelectCoin></SelectCoin>
+    <div class='App'>
+      <Container fluid>
+        <Row>
+          <Col xs={12} md={4}>
+            <ComboBox></ComboBox>
+          </Col>
+          <Col xs={6} md={4}>
+            <TextField
+              id='outlined-basic'
+              label='Số lượng'
+              variant='outlined'
+            />
+          </Col>
+          <Col xs={6} md={4}>
+            <TextField
+              id='outlined-number'
+              label='Number'
+              type='number'
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant='outlined'
+            />
+          </Col>
+        </Row>
+        <Row></Row>
+      </Container>
     </div>
   );
 }
