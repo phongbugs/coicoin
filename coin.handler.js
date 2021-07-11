@@ -79,7 +79,7 @@ const log = console.log,
 (() => {
   //https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png
 
-  //==> Map Raw Data to Array Json
+  //==> Map raw data to array json
   // toJson({
   //   data: readCoins({
   //     srcRawDataFile: './coin.data.raw.json',
@@ -88,7 +88,7 @@ const log = console.log,
   //   destFile: './coin.map.js',
   // });
 
-  //==> Map Raw Data to Object Json
+  //==> Map raw data to object json
   toJson({
     data: readCoins({
       srcRawDataFile: './coin.data.raw.json',
@@ -100,7 +100,7 @@ const log = console.log,
   //==> Convert json array to csv file
   // toCsv({ srcFile: 'coin.map.js', destFile: 'coin.map.csv' });
 
-  //==> Convert Raw Data to map array json and to csv file
+  //==> Convert raw data to csv file
   convertJsonToCsv({
     srcRawDataFile: './coin.data.raw.json',
     destJsonFile: './coin.map.js',
