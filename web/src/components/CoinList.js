@@ -9,24 +9,33 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { entities, removeCoin } from '../redux/slice';
+import { useSelector, useDispatch } from 'react-redux';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
 }));
+// const fetchPrice = (symbol) => {
+//   return 35345
+// }
+// const addCoin = (data, {s, q, of}) => {
+//     let coins = {s, q, of}
+//     data['price'] = fetchPrice('BTC')
+//     data.push(coins)
+// }
 
 export default function CoinList() {
+  const data = useSelector(entities);
+  const dispatch = useDispatch();
   const classes = useStyles(),
     srcCoinIconPrefix = 'https://s2.coinmarketcap.com/static/img/coins/64x64/',
     extensionCoinIcon = '.png',
     widthCoinIcon = '32px',
-    heightCoinIcon = '32px',
-    data = [
-      { i: 1, s: 'BTC', n: 'Bitcoin', of: 201.3245, q: 0.1234, cf: 100 },
-      { i: 1027, s: 'ETH', n: 'Etherum', of: 501.1234, q: 0.4321, cf: 700 },
-    ],
+    heightCoinIcon = '32px';
+  let coinItems = [];
+  if (data.length > 0) {
     coinItems = data.map((record, index) => {
       let profix = record.of - record.cf,
         profixPercent = profix / record.of;
@@ -45,27 +54,35 @@ export default function CoinList() {
               </IconButton>
             </Avatar>
           </ListItemAvatar>
-
           <ListItemText primary={record.s} secondary={record.n} />
-
           <ListItemText primary={record.q} secondary={record.cf + ' $'} />
-
           <ListItemText
             primary={record.of.toFixed(2) + ' $'}
             secondary={
-              <Typography style={{ color: profix < 0 ? 'red' : 'green', fontSize:'13px' }}>
-                {profix.toFixed(2)}$ <i>({(profixPercent*100).toFixed(2)}%)</i>
+              <Typography
+                style={{
+                  color: profix < 0 ? 'red' : '#02C076',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {profix.toFixed(2)} $ (
+                <i>{(profixPercent * 100).toFixed(2)}%</i>)
               </Typography>
             }
           />
           <ListItemSecondaryAction>
-            <IconButton edge='end' aria-label='delete' style={{ color: '#CF304A' }}>
+            <IconButton
+              edge='end'
+              aria-label='delete'
+              style={{ color: '#CF304A' }}
+              onClick={() => dispatch(removeCoin({symbol:'BTC', pair:'USDT'}))}
+            >
               <DeleteIcon />
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
       );
     });
-
+  }
   return <List className={classes.root}>{coinItems}</List>;
 }

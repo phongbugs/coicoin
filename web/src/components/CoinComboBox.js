@@ -3,14 +3,8 @@ import React, { Fragment } from 'react';
 import CoinTextField from './CoinTextField.js';
 import IconButton from '@material-ui/core/IconButton';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { Coins } from './coin.map.js';
+import { Coins } from '../data/coin.map.js';
 import { createFilterOptions } from '@material-ui/lab/Autocomplete';
-// import { makeStyles } from '@material-ui/core/styles';
-// const useStyles = makeStyles((theme) => ({
-//   input: {
-//     color: 'white',
-//   },
-// }));
 export default function CoinComboBox(props) {
   const srcCoinIconPrefix =
       'https://s2.coinmarketcap.com/static/img/coins/64x64/',
@@ -37,9 +31,6 @@ export default function CoinComboBox(props) {
             shrink: true,
           }}
           variant='outlined'
-          // InputProps={{
-          //   className: 'inputColor',
-          // }}
           placeholder='Nhập mã coin'
         />
       )}
@@ -54,7 +45,6 @@ export default function CoinComboBox(props) {
                 height={heightCoinIcon}
                 src={srcCoinIconPrefix + option.i + extensionCoinIcon}
               />{' '}
-              {/*Mock image, attribute in option*/}
             </IconButton>
             {option.n}
           </Fragment>
@@ -76,14 +66,6 @@ export default function CoinComboBox(props) {
           </Fragment>
         );
       }}
-      // renderInput={(params) => (
-      //   <TextField
-      //     {...params}
-      //     variant='outlined'
-      //     label='limitTags'
-      //     placeholder='Favorites'
-      //   />
-      // )}
     />
   );
 }
