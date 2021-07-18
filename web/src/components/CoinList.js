@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -11,10 +11,13 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { entities, removeCoin } from '../redux/slice';
 import { useSelector, useDispatch } from 'react-redux';
+import TrendingDownIcon from '@material-ui/icons/TrendingDown';
+import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    backgroundColor: theme.palette.background.paper,
+    //backgroundColor: theme.palette.background.paper,
+    backgroundColor: '#b1b19a',
   },
 }));
 
@@ -36,13 +39,25 @@ export default function CoinList() {
     widthCoinIcon = '32px',
     heightCoinIcon = '32px';
   let coinItems = [];
+  let trendingIcon = (profix) =>
+    profix > 0 ? (
+      <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    ) : (
+      <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    );
+  const CoinListItemText = withStyles({
+    root: {
+      textAlign: 'left',
+      backgroundColor: 'transparent',
+    },
+  })(ListItemText);
   if (data.length > 0) {
     coinItems = data.map((record, index) => {
-      let profix = record.of - record.cf,
+      let profix = record.cf - record.of,
         profixPercent = profix / record.of;
       return (
         <ListItem key={index}>
-          <ListItemAvatar>
+          <ListItemAvatar style={{ width: '32px' }}>
             <Avatar>
               <IconButton color='primary'>
                 <img
@@ -51,36 +66,48 @@ export default function CoinList() {
                   height={heightCoinIcon}
                   src={srcCoinIconPrefix + record.i + extensionCoinIcon}
                 />{' '}
-                {/*Mock image, attribute in option*/}
               </IconButton>
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary={record.s} secondary={record.n} />
-          <ListItemText primary={record.q} secondary={record.cf + ' $'} />
-          <ListItemText
+          <CoinListItemText
+            style={{ width: '25%' }}
+            primary={record.s}
+            secondary={record.n}
+          />
+          <CoinListItemText
+            style={{ width: '30%' }}
+            alignItems='flex-start'
+            primary={record.q.toFixed(3)}
+            secondary={record.cf.toFixed(3) + ' $'}
+          />
+          <CoinListItemText
+            style={{ width: '50%' }}
             primary={record.of.toFixed(2) + ' $'}
             secondary={
               <Typography
                 style={{
-                  color: profix < 0 ? 'red' : '#02C076',
+                  color: profix < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
                   fontSize: '0.875rem',
                 }}
               >
-                {profix.toFixed(2)} $ (
-                <i>{(profixPercent * 100).toFixed(2)}%</i>)
+                {trendingIcon(profix)}
+                {' ' + Math.abs(profix.toFixed(2))} $ (
+                <i>{(Math.abs(profixPercent) * 100).toFixed(2)}%</i>)
               </Typography>
             }
           />
-          <ListItemSecondaryAction>
+          {/* <ListItemSecondaryAction>
             <IconButton
               edge='end'
               aria-label='delete'
               style={{ color: '#CF304A' }}
-              onClick={() => dispatch(removeCoin({symbol:'BTC', pair:'USDT'}))}
+              onClick={() =>
+                dispatch(removeCoin({ symbol: 'BTC', pair: 'USDT' }))
+              }
             >
               <DeleteIcon />
             </IconButton>
-          </ListItemSecondaryAction>
+          </ListItemSecondaryAction> */}
         </ListItem>
       );
     });

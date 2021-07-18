@@ -1,11 +1,11 @@
-/* eslint-disable no-use-before-define */
 import React, { Fragment } from 'react';
 import CoinTextField from './CoinTextField.js';
 import IconButton from '@material-ui/core/IconButton';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Coins } from '../data/coin.map.js';
 import { createFilterOptions } from '@material-ui/lab/Autocomplete';
-export default function CoinComboBox(props) {
+
+export default function PairComboBox(props) {
   const srcCoinIconPrefix =
       'https://s2.coinmarketcap.com/static/img/coins/64x64/',
     extensionCoinIcon = '.png',
@@ -16,7 +16,6 @@ export default function CoinComboBox(props) {
       stringify: (option) => option.s,
       limit: 20,
     });
-  console.log(props);
   return (
     <Autocomplete
       size='small'
@@ -24,19 +23,18 @@ export default function CoinComboBox(props) {
       options={Coins}
       getOptionLabel={(option) => option.s}
       style={{ marginBottom: '10px', color: 'white' }}
-      onChange={(e, v) => props.sendSymbol(v ? v.s : '')}
-      //inputValue={input}
+      onChange={(e, v) => props.sendSymbolPair(v ? v.s : '')}
+      defaultValue={Coins.find((coin) => coin.s === 'USDT')}
       renderInput={(params) => (
         <CoinTextField
           {...params}
-          label='Nhập mã coin'
-          // InputLabelProps={{
-          //   shrink: true,
-          // }}
-          placeholder='Nhập mã coin'
+          label='Tính giá theo loại tiền'
+          //placeholder='Tính giá theo loại tiền'
+          InputLabelProps={{
+            shrink: true,
+          }}
           variant='outlined'
-          onChange={(e) => props.sendSymbol(e.target.value.s)}
-          //value={input.s}
+          onChange={(e) => props.sendSymbolPair(e.target.value.s)}
         />
       )}
       filterOptions={filterOptions}
@@ -65,7 +63,6 @@ export default function CoinComboBox(props) {
                 height={heightCoinIcon}
                 src={srcCoinIconPrefix + option.i + extensionCoinIcon}
               />{' '}
-              {/*Mock image, attribute in option*/}
             </IconButton>
             {option.n + ' (' + option.s + ')'}
           </Fragment>
