@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-function fetchPrice(symbol, pair){
-    return 100
+function fetchPrice(symbol, pair) {
+  return 100;
 }
 export const slice = createSlice({
   name: 'coin',
@@ -23,14 +23,16 @@ export const slice = createSlice({
       // doesn't actually mutate the state because it uses the immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
-      console.log(action.payload)
-      let coin = {...action.payload, of:1, cf:3}
-      state.entities.push(coin);
+      if (action.payload) {
+        console.log(action.payload);
+        let coin = { ...action.payload, of: 1, cf: 3 };
+        state.entities.push(coin);
+      }
     },
     removeCoin: (state, action) => {
-        state.entities.splice(0, 1);
-        console.log(action);
-    }
+      state.entities.splice(0, 1);
+      console.log(action);
+    },
   },
 });
 

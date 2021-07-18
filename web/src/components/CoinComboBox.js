@@ -15,23 +15,28 @@ export default function CoinComboBox(props) {
       matchFrom: 'start',
       stringify: (option) => option.s,
       limit: 20,
-    })
+    });
+  console.log(props);
   return (
     <Autocomplete
       size='small'
       id='combo-box-demo'
       options={Coins}
       getOptionLabel={(option) => option.s}
-      style={{ marginBottom: '10px', color:'white' }}
+      style={{ marginBottom: '10px', color: 'white' }}
+      onChange={(e, v) => props.sendSymbol(v.s)}
+      //inputValue={input}
       renderInput={(params) => (
         <CoinTextField
           {...params}
-          label='Tên coin'
-          InputLabelProps={{
-            shrink: true,
-          }}
-          variant='outlined'
+          label='Nhập mã coin'
+          // InputLabelProps={{
+          //   shrink: true,
+          // }}
           placeholder='Nhập mã coin'
+          variant='outlined'
+          onChange={(e) => props.sendSymbol(e.target.value.s)}
+          //value={input.s}
         />
       )}
       filterOptions={filterOptions}

@@ -27,13 +27,30 @@ function App() {
   const [quantityCoin, setQuantityCoin] = useState('');
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
+
+  const isValidForm = () => {
+    if (originalFund === '' || !quantityCoin === '' || !symbolCoin === '') {
+      alert('Thiếu dữ liệu');
+      return false;
+    }
+    return true;
+  };
   const getCoin = (symbol) => {
-    console.log(symbol)
-    let coin = Coins.find((coin) => coin.s === symbol);
-    coin['p'] = 'USDT';
-    coin['q'] = quantityCoin;
-    coin['of'] = originalFund;
+    let coin = null;
+    if (isValidForm()) {
+      console.log(symbol);
+      coin = Coins.find((coin) => coin.s === symbol.toUpperCase());
+      if (coin) {
+        coin['p'] = 'USDT';
+        coin['q'] = quantityCoin;
+        coin['of'] = originalFund;
+      }
+    }
     return coin;
+  };
+  const sendSymbol = (symbol) => {
+    console.log(symbol);
+    setSymbolCoin(symbol);
   };
   return (
     <div className={classes.root}>
@@ -44,7 +61,7 @@ function App() {
               className: classes.input,
             }}
             value={symbolCoin}
-            onChange={(e) => setSymbolCoin(e.target.value)}
+            sendSymbol={sendSymbol}
           />
         </Grid>
         <Grid item xs={4} sm={3} md={3} lg={3} xl={3}>
@@ -53,9 +70,9 @@ function App() {
             id='txtQuantity'
             label='Số lượng'
             type='number'
-            InputLabelProps={{
-              shrink: true,
-            }}
+            // InputLabelProps={{
+            //   shrink: true,
+            // }}
             variant='outlined'
             InputProps={{
               className: classes.input,
@@ -70,9 +87,9 @@ function App() {
             id='txtFund'
             label='Vốn'
             type='number'
-            InputLabelProps={{
-              shrink: true,
-            }}
+            // InputLabelProps={{
+            //   shrink: true,
+            // }}
             variant='outlined'
             InputProps={{
               className: classes.input,

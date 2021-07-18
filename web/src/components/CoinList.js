@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
   },
 }));
+
 // const fetchPrice = (symbol) => {
 //   return 35345
 // }
