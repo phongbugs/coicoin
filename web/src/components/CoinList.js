@@ -50,7 +50,17 @@ export default function CoinList() {
       textAlign: 'left',
       backgroundColor: 'transparent',
     },
-  })(ListItemText);
+  })(ListItemText)
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+  })
+  const formatOriginalFund = (fund) =>{
+    if(fund % 1 === 0)
+      return fund + ' $'
+    return formatter.format(fund).replace('$','').replace('.00', '') + ' $'
+  }
   if (data.length > 0) {
     coinItems = data.map((record, index) => {
       let profix = record.cf - record.of,
@@ -74,16 +84,17 @@ export default function CoinList() {
             primary={record.s}
             secondary={record.n}
           />
+          {/* Quantity Coin & Original Fund */}
           <CoinListItemText
             style={{ width: '30%' }}
             alignItems='flex-start'
-            primary={record.q.toFixed(3)}
-            secondary={record.cf.toFixed(3) + ' $'}
+            primary={record.q > 1000000 ? (record.q/1000000).toFixed(2) + ' M': formatter.format(record.q).replace('$','').replace('.00', '')}
+            secondary={formatOriginalFund(record.of)}
           />
+          {/* Percent Profix & Current Fund */}
           <CoinListItemText
             style={{ width: '50%' }}
-            primary={record.of.toFixed(2) + ' $'}
-            secondary={
+            primary={
               <Typography
                 style={{
                   color: profix < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
@@ -92,9 +103,10 @@ export default function CoinList() {
               >
                 {trendingIcon(profix)}
                 {' ' + Math.abs(profix.toFixed(2))} $ (
-                <i>{(Math.abs(profixPercent) * 100).toFixed(2)}%</i>)
+                <i>{(Math.abs(profixPercent) * 100).toFixed(1)}%</i>)
               </Typography>
             }
+            secondary={record.cf.toFixed(2) + ' $'}
           />
           {/* <ListItemSecondaryAction>
             <IconButton
