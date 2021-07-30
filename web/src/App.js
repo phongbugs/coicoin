@@ -35,11 +35,18 @@ function App() {
   const [symbolCoinPair, setSymbolCoinPair] = useState('');
 
   const isValidForm = () => {
-    if (originalFund === '' || !quantityCoin === '' || !symbolCoin === '') {
+    if (originalFund === '' || quantityCoin === '' || symbolCoin === '') {
       alert('Thiếu dữ liệu');
       return false;
     }
+    if(+originalFund === 0 || +quantityCoin === 0){
+      alert('Số không hợp lệ');
+      return false;
+    }
     return true;
+  };
+  const fetchPrice = (symbol) => {
+    return 1234;
   };
   const getCoin = (symbol) => {
     let coin = null;
@@ -48,8 +55,9 @@ function App() {
       coin = Coins.find((coin) => coin.s === symbol.toUpperCase());
       if (coin) {
         coin['p'] = 'USDT';
-        coin['q'] = quantityCoin;
-        coin['of'] = originalFund;
+        coin['q'] = +quantityCoin;
+        coin['of'] = +originalFund;
+        coin['cf'] = fetchPrice() * +quantityCoin;
       }
     }
     return coin;
