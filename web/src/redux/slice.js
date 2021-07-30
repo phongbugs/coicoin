@@ -33,7 +33,7 @@ export const slice = createSlice({
       // immutable state based off those changes
       if (action.payload) {
         console.log(action.payload);
-        let coin = { ...action.payload, of: 1, cf: 3 };
+        let coin = { ...action.payload };
         state.entities.push(coin);
       }
     },
