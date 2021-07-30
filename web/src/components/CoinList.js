@@ -50,17 +50,58 @@ export default function CoinList() {
       textAlign: 'left',
       backgroundColor: 'transparent',
     },
-  })(ListItemText)
+  })(ListItemText);
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 2
-  })
-  const formatOriginalFund = (fund) =>{
-    if(fund % 1 === 0)
-      return fund + ' $'
-    return formatter.format(fund).replace('$','').replace('.00', '') + ' $'
-  }
+    minimumFractionDigits: 2,
+  });
+  const formatOriginalFund = (fund) => {
+    if (fund % 1 === 0)
+      return (
+        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
+        ' $'
+      );
+    return formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
+  };
+  const formatCurentFund = (fund) => {
+    if (fund % 1 === 0)
+      fund =
+        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
+        ' $';
+    else
+      fund = formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
+    return (
+      <>
+        {fund}
+        <DeleteIcon
+          style={{ float: 'right', color: '#ab2828', cursor:'pointer' }}
+          onClick={() => dispatch(removeCoin({ symbol: 'BTC', pair: 'USDT' }))}
+        />
+      </>
+    );
+  };
+  const formatQuantityCoin = (quantity) => {
+    if (quantity >= 1000000) quantity = (quantity / 1000000).toFixed(2) + 'M';
+    else if (quantity >= 100000) quantity = (quantity / 1000).toFixed(2) + 'K';
+    else
+      quantity = formatter.format(quantity).replace('$', '').replace('.00', '');
+    return quantity;
+  };
+  const formatProfix = (profix, profixPercent) => {
+    return (
+      <Typography
+        style={{
+          color: profix < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
+          fontSize: '0.875rem',
+        }}
+      >
+        {trendingIcon(profix)}
+        {' ' + formatOriginalFund(Math.abs(profix))}(
+        <i>{(Math.abs(profixPercent) * 100).toFixed(1)}%</i>)
+      </Typography>
+    );
+  };
   if (data.length > 0) {
     coinItems = data.map((record, index) => {
       let profix = record.cf - record.of,
@@ -87,27 +128,17 @@ export default function CoinList() {
           {/* Quantity Coin & Original Fund */}
           <CoinListItemText
             style={{ width: '30%' }}
-            alignItems='flex-start'
-            primary={record.q > 1000000 ? (record.q/1000000).toFixed(2) + ' M': formatter.format(record.q).replace('$','').replace('.00', '')}
+            //alignItems='flex-start'
+            primary={formatQuantityCoin(record.q)}
             secondary={formatOriginalFund(record.of)}
           />
           {/* Percent Profix & Current Fund */}
           <CoinListItemText
             style={{ width: '50%' }}
-            primary={
-              <Typography
-                style={{
-                  color: profix < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
-                  fontSize: '0.875rem',
-                }}
-              >
-                {trendingIcon(profix)}
-                {' ' + Math.abs(profix.toFixed(2))} $ (
-                <i>{(Math.abs(profixPercent) * 100).toFixed(1)}%</i>)
-              </Typography>
-            }
-            secondary={record.cf.toFixed(2) + ' $'}
+            primary={formatProfix(profix, profixPercent)}
+            secondary={formatCurentFund(record.cf)}
           />
+          {/* <DeleteIcon color="secondary" /> */}
           {/* <ListItemSecondaryAction>
             <IconButton
               edge='end'
