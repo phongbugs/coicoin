@@ -1,43 +1,51 @@
-const Binance = require('node-binance-api'),
-  cfg = require('./config');
-const binance = new Binance().options({
-  APIKEY: cfg.APIKEY,
-  APISECRET: cfg.APISECRET,
-});
-const getPrice = (market) => {
-  binance.prices(market, (error, ticker) => {
-    console.info('Price of %s: %s', market, ticker[market]);
-    console.log(ticker);
-  });
-};
-(async () => {
-  //   let ticker = await binance.prices();
-  //   console.info(`Price of BNB: ${ticker.BNBUSDT}`);
-  let cryptoNames = [
-    'BTCUSDT',
-    'ETHUSDT',
-    'BNBUSDT',
-    'XRPUSDT',
-    'MATICUSDT',
-    'ADAUSDT',
-    'TLMUSDT',
-    'BTTUSDT',
-    'WINUSDT',
-  ];
-  cryptoNames.forEach((market) => {
-    getPrice(market);
-  });
-  // binance.prices('BNBUSDT', (error, ticker) => {
-  //   console.info('Price of BNB: ', ticker.BNBUSDT);
-  //   console.log(ticker);
-  // });
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 
-  // binance.useServerTime(() =>
-  //   binance.balance((error, balances) => {
-  //     if (error) return console.error(error.body);
-  //     console.log('balances()', balances);
-  //     if (typeof balances.ETH !== 'undefined')
-  //       console.log('ETH balance: ', balances.BNB.available);
-  //   })
-  // );
-})();
+var indexRouter = require('./routes/index');
+var infoRouter = require('./routes/info');
+
+const bodyParser = require('body-parser');
+var busboy = require('connect-busboy');
+var app = express();
+const cors = require('cors');
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocumentFileName = './swagger.json';
+const swaggerDocument = require(swaggerDocumentFileName);
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(busboy());
+app.use(cors({
+  origin : "http://localhost:3000",
+  credentials: true,
+}))
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/', indexRouter);
+app.use('/info', infoRouter);
+
+// catch 404 and forward to error handler
+app.use(function (_, _, next) {
+  next(createError(404));
+});
+
+// error handler
+app.use(function (err, req, res, _) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+module.exports = app;
