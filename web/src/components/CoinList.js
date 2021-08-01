@@ -97,7 +97,7 @@ export default function CoinList() {
         }}
       >
         {trendingIcon(profix)}
-        {' ' + formatOriginalFund(Math.abs(profix))}(
+        {' ' + formatOriginalFund(Math.abs(profix))} (
         <i>{(Math.abs(profixPercent) * 100).toFixed(1)}%</i>)
       </Typography>
     );
