@@ -24,10 +24,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(busboy());
-app.use(cors({
-  origin : "http://localhost:3000",
-  credentials: true,
-}))
+// app.use(cors({
+//   origin : "http://localhost:3000",
+//   credentials: true,
+// }))
+app.use(function (req, res, next) {
+  var allowedDomains = [
+    'http://localhost:3000',
+    'http://192.168.2.185:3000',
+  ];
+  var origin = req.headers.origin;
+  if (allowedDomains.indexOf(origin) > -1) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+  );
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With,content-type, Accept'
+  );
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+});
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/', indexRouter);
