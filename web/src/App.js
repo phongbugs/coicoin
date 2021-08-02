@@ -8,8 +8,8 @@ import Button from '@material-ui/core/Button';
 import CoinList from './components/CoinList';
 import PairComboBox from './components/PairComboBox';
 import { makeStyles } from '@material-ui/core/styles';
-import { useDispatch } from 'react-redux';
-import { addCoin, updateCoins, entities } from './redux/slice';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { addCoin, updateCoins } from './redux/slice';
 import { Coins } from './data/coin.map';
 import fetch from 'node-fetch';
 const useStyles = makeStyles((theme) => ({
@@ -42,14 +42,21 @@ const fetchPrices = async (markets) => {
 };
 const getCoinsWithNewPrices = async (coins) => {
   let prices = await fetchPrices(coins.map((coin) => coin.s + coin.p));
-  log(prices);
   return coins.map((coin) => {
     let market = coin.s + coin.p;
-    coin.cf = coin.q * prices[market];
-    return coin;
+    let c = { ...coin, cf: coin.q * prices[market] };
+    return c
   });
 };
-
+function delay(second) {
+  return new Promise((res) => setTimeout(res, second * 1000));
+}
+const runUpdatePrices = async (dispatch, entities) => {
+  log('coicoin')
+  dispatch(updateCoins(await getCoinsWithNewPrices(entities)));
+  await delay(2);
+  await runUpdatePrices(dispatch, entities);
+};
 function App() {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -57,9 +64,15 @@ function App() {
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
   const [symbolCoinPair, setSymbolCoinPair] = useState('USDT');
-  // useEffect(() => {
-  //   setTimeout(() => updateCoins(entities), 20000);
-  // });
+  const { currentState } = useSelector(
+    (state) => ({ currentState: state.coin }),
+    shallowEqual
+  );
+  useEffect(() => {
+    // setTimeout(() => log(currentState), 10000);
+    // log(currentState);
+    runUpdatePrices(dispatch, currentState.entities);
+  }, []);
   const sendSymbol = (symbol) => {
     console.log(symbol);
     setSymbolCoin(symbol);
@@ -183,7 +196,7 @@ function App() {
             variant='contained'
             startIcon={<AddIcon />}
             onClick={async () =>
-              dispatch(updateCoins(await getCoinsWithNewPrices(entities)))
+              dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)))
             }
           >
             Thêm

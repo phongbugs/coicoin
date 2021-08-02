@@ -16,7 +16,7 @@ function getPrice(callback) {
     }
   });
 }
-const WAIT_NEXT_FETCHING = 10000; // 1 second
+const WAIT_NEXT_FETCHING = 3000; // 1 second
 async function run() {
   try {
     getPrice((prices) => {

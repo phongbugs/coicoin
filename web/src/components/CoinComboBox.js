@@ -16,7 +16,6 @@ export default function CoinComboBox(props) {
       stringify: (option) => option.s,
       limit: 20,
     });
-  console.log(props);
   return (
     <Autocomplete
       size='small'

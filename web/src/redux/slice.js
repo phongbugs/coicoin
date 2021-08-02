@@ -37,16 +37,13 @@ export const slice = createSlice({
         state.entities.push(coin);
       }
     },
-    updateCoins: (state, action) => {
-      if (action.payload) {
-        //console.log(action.payload);
-        let coins = { ...action.payload };
-        state.entities = coins
-      }
-    },
+    updateCoins: (state, { payload }) => ({
+      ...state,
+      entities: payload
+    }),
     removeCoin: (state, action) => {
       state.entities.splice(0, 1);
-      console.log(action);
+      //console.log(action);
     },
   },
 });

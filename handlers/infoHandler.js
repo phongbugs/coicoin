@@ -14,11 +14,10 @@ function fetchPrice(req, res) {
 function fetchPrices(req, res) {
   try {
     let markets = req.params.markets.split(',');
-    let prices = markets.map((market) => {
-      let price = {};
-      price[market] = global.PRICES[market];
-      return price;
-    });
+    let prices = {};
+    markets.forEach(
+      (market) => (prices[market] = global.PRICES[market])
+    );
     res.send(prices);
   } catch (error) {
     log(error);
