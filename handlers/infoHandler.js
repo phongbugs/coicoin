@@ -1,23 +1,41 @@
 const log = console.log,
-  fetch = require('node-fetch'),
-  crawler = require('../binance.crawler');
+  fetch = require('node-fetch');
 
-function fetchPrice(req, res) {
+async function fetchPrice(req, res) {
+  let market = req.params.market;
   try {
-    let market = req.params.market;
-    res.send(global.PRICES[market]);
+    // let price = global.PRICES[market];
+    // log(price);
+    if ( global.PRICES[market]) res.send( global.PRICES[market]);
+    else {
+      let url =
+        'https://http-api.livecoinwatch.com/coins/history/range?' +
+        new URLSearchParams({
+          coin: market.substring(0, market.length - 4),
+          start: new Date().getTime() - 600000,
+          end: new Date().getTime(),
+          currency: market.substr(market.length - 4, 3),
+        });
+      log(url);
+      const response = await fetch(url);
+      const prices = await response.json();
+      log(prices);
+      let lastPrice = prices.data[0].rate;
+      global.PRICES[market] = lastPrice + '';
+      log(lastPrice);
+      res.send(lastPrice.toString());
+    }
   } catch (error) {
+    log(market);
     log(error);
-    res.send(error);
+    //res.send(error);
   }
 }
 function fetchPrices(req, res) {
   try {
     let markets = req.params.markets.split(',');
     let prices = {};
-    markets.forEach(
-      (market) => (prices[market] = global.PRICES[market])
-    );
+    markets.forEach((market) => (prices[market] = global.PRICES[market]));
     res.send(prices);
   } catch (error) {
     log(error);
