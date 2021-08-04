@@ -8,7 +8,7 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+//import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { entities, removeCoin } from '../redux/slice';
 import { useSelector, useDispatch } from 'react-redux';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
@@ -75,7 +75,7 @@ export default function CoinList() {
       <>
         {fund}
         <DeleteIcon
-          style={{ float: 'right', color: '#ab2828', cursor:'pointer' }}
+          style={{ float: 'right', color: '#ab2828', cursor: 'pointer' }}
           onClick={() => dispatch(removeCoin({ symbol: 'BTC', pair: 'USDT' }))}
         />
       </>
@@ -84,9 +84,14 @@ export default function CoinList() {
   const formatQuantityCoin = (quantity) => {
     if (quantity >= 1000000) quantity = (quantity / 1000000).toFixed(2) + 'M';
     else if (quantity >= 100000) quantity = (quantity / 1000).toFixed(2) + 'K';
+    else if (quantity < 1) quantity = quantity.toFixed(5);
     else
       quantity = formatter.format(quantity).replace('$', '').replace('.00', '');
     return quantity;
+  };
+  const formatSymbolCoin = (symbol) => {
+    if(symbol.length > 5) symbol = symbol.substring(0,5) + '...'
+    return symbol;
   };
   const formatProfix = (profix, profixPercent) => {
     return (
@@ -122,7 +127,7 @@ export default function CoinList() {
           </ListItemAvatar>
           <CoinListItemText
             style={{ width: '25%' }}
-            primary={record.s}
+            primary={formatSymbolCoin(record.s)}
             secondary={record.n}
           />
           {/* Quantity Coin & Original Fund */}
