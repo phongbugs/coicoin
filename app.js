@@ -6,11 +6,11 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var infoRouter = require('./routes/info');
+var statisticsRouter = require('./routes/statistics');
 
 const bodyParser = require('body-parser');
 var busboy = require('connect-busboy');
 var app = express();
-const cors = require('cors');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocumentFileName = './swagger.json';
@@ -24,10 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(busboy());
-// app.use(cors({
-//   origin : "http://localhost:3000",
-//   credentials: true,
-// }))
+
 app.use(function (req, res, next) {
   var allowedDomains = [
     'http://localhost:3000',
@@ -52,6 +49,7 @@ app.use(function (req, res, next) {
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/', indexRouter);
 app.use('/info', infoRouter);
+app.use('/statistics', statisticsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (_, _, next) {

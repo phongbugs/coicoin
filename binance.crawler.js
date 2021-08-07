@@ -5,29 +5,28 @@ const binance = new Binance().options({
   APIKEY: cfg.APIKEY,
   APISECRET: cfg.APISECRET,
 });
-function getPrice(callback) {
+function getAllMarkets(callback) {
   return binance.prices((error, ticker) => {
     try {
-      //console.log(ticker);
       callback(ticker);
     } catch (error) {
       log(error);
-      callback(error);
+      //callback(error);
     }
   });
 }
 const WAIT_NEXT_FETCHING = 3000; // 1 second
 async function run() {
   try {
-    getPrice((prices) => {
-      global.PRICES = prices;
+    getAllMarkets((markets) => {
+      global.MARKETS = markets;
       log(
         '%s: waiting after %s',
         new Date().toLocaleString(),
         WAIT_NEXT_FETCHING
       );
-      log(prices.BTCUSDT)
-      setTimeout(async () => await run(), WAIT_NEXT_FETCHING);
+      log(markets.BTCUSDT);
+      //setTimeout(async () => await run(), WAIT_NEXT_FETCHING);
     });
   } catch (error) {
     log(error);
@@ -41,11 +40,11 @@ async function run() {
 }
 
 module.exports = {
-  getPrice,
+  getAllMarkets,
   run,
 };
 (async () => {
-  // let ticker = await binance.prices();
+  // let ticker = await binance.markets();
   // log(ticker);
   // console.info(`Price of BNB: ${ticker.BNBUSDT}`);
   // let cryptoNames = [
@@ -62,11 +61,10 @@ module.exports = {
   // cryptoNames.forEach((market) => {
   //   getPrice(market);
   // });
-  // binance.prices('BNBUSDT', (error, ticker) => {
+  // binance.markets('BNBUSDT', (error, ticker) => {
   //   console.info('Price of BNB: ', ticker.BNBUSDT);
   //   console.log(ticker);
   // });
-
   // binance.useServerTime(() =>
   //   binance.balance((error, balances) => {
   //     if (error) return console.error(error.body);
