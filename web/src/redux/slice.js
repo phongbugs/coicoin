@@ -15,7 +15,7 @@ export const slice = createSlice({
         { i: 3718, s: 'BTT', p:'USDT', n: 'Bittorrent', of: 288, q: 51412.536, cf: 99.01 },
         { i: 2010, s: 'ADA', p:'USDT', n: 'Cardano', of: 100, q: 60.17976, cf: 68.08},
         { i: 4206, s: 'WIN', p:'USDT', n: 'WINK', of: 116.15, q: 112945.941, cf: 30.55 },
-        { i: 825, s: 'USDT', p:'USDT', n: 'TetherUS', of: 1, q: 1123.43951374, cf: 2 },
+        { i: 825, s: 'USDT', p:'USDT', n: 'TetherUS', of: 1123, q: 1123.43951374, cf: 2 },
       ],
     // originalFund:0,
     // quantityCoin:0,

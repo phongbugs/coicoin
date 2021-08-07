@@ -21,15 +21,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// const fetchPrice = (symbol) => {
-//   return 35345
-// }
-// const addCoin = (data, {s, q, of}) => {
-//     let coins = {s, q, of}
-//     data['price'] = fetchPrice('BTC')
-//     data.push(coins)
-// }
-
 export default function CoinList() {
   const data = useSelector(entities);
   const dispatch = useDispatch();

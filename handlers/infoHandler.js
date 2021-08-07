@@ -1,12 +1,36 @@
 const log = console.log,
   fetch = require('node-fetch');
 
+async function fetchPriceFrom3rdParty(market) {
+  try {
+    let url =
+      'https://http-api.livecoinwatch.com/coins/history/range?' +
+      new URLSearchParams({
+        coin: market.substring(0, market.length - 4),
+        start: new Date().getTime() - 600000,
+        end: new Date().getTime(),
+        currency: market.substr(market.length - 4, 3),
+      });
+    log(url);
+    const response = await fetch(url);
+    const prices = await response.json();
+    log(prices);
+    let lastPrice = prices.data[0].rate;
+    global.PRICES[market] = lastPrice + '';
+    log(lastPrice);
+    return lastPrice;
+  } catch (error) {
+    log(market);
+    log(error);
+  }
+}
+
 async function fetchPrice(req, res) {
   let market = req.params.market;
   try {
     // let price = global.PRICES[market];
     // log(price);
-    if ( global.PRICES[market]) res.send( global.PRICES[market]);
+    if (global.PRICES[market]) res.send(global.PRICES[market]);
     else {
       let url =
         'https://http-api.livecoinwatch.com/coins/history/range?' +
@@ -31,12 +55,18 @@ async function fetchPrice(req, res) {
     //res.send(error);
   }
 }
-function fetchPrices(req, res) {
+async function fetchPrices(req, res) {
   try {
     let markets = req.params.markets.split(',');
     let prices = {};
-    markets.forEach((market) => (prices[market] = global.PRICES[market]));
-    res.send(prices);
+    Promise.all(
+      markets.map(async (market) => {
+        if (global.PRICES[market]) prices[market] = global.PRICES[market];
+        else prices[market] = await fetchPriceFrom3rdParty(market);
+      })
+    ).then(() => {
+      res.send(prices);
+    });
   } catch (error) {
     log(error);
     res.send(error);

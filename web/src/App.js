@@ -5,6 +5,7 @@ import CoinTextField from './components/CoinTextField';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import SyncIcon from '@material-ui/icons/Sync';
 import Button from '@material-ui/core/Button';
 import CoinList from './components/CoinList';
 import PairComboBox from './components/PairComboBox';
@@ -75,6 +76,7 @@ function App() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [isAdding, setIsAdding] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [quantityCoin, setQuantityCoin] = useState('');
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
@@ -223,21 +225,23 @@ function App() {
             }}
             variant='contained'
             startIcon={
-              isAdding ? (
+              isUpdating ? (
                 <CircularProgress size={20} style={{ color: '#fff' }} />
               ) : (
-                <AddIcon />
+                <SyncIcon />
               )
             }
             onClick={async () => {
+              setIsUpdating(true)
               dispatch(
                 updateCoins(await getCoinsWithNewPrices(currentState.entities))
               );
               //runUpdatePrices(dispatch, currentState.entities);
               log(currentState);
+              setIsUpdating(false)
             }}
           >
-            Thêm
+            Cập nhật
           </Button>
         </Grid>
       </Grid>
