@@ -5,12 +5,12 @@
  *      symbols : ['BTC', 'BNB'],
  * }
  */
-const binanceCrawler = require('../binance.crawler'),
+const getAllMarkets = require('../binance.crawler').getAllMarkets,
   log = console.log,
   fetch = require('node-fetch'),
   fetchBinanceSymbolCoins = (callback) => {
     try {
-      binanceCrawler.getAllMarkets((markets) => {
+      getAllMarkets((markets) => {
         var listBinanceSymbols = [];
         for (market in markets) {
           let usdt = market.substr(market.length - 4, 4);
@@ -45,7 +45,7 @@ const binanceCrawler = require('../binance.crawler'),
       log(error);
     }
   },
-  fetchOuterBinanceSymbols = async (callback) => {
+  fetchOuterBinanceSymbols = (callback) => {
     try {
       fetchBinanceSymbolCoins(async (binanceSymbols) => {
         let cmcSymbols = await fetchCoinmarketcapSymbolCoins();
@@ -62,7 +62,7 @@ const binanceCrawler = require('../binance.crawler'),
   getInfoBinance = async (_, res) => {
     try {
       fetchBinanceSymbolCoins((symbols) => {
-        res.send({ quantity: symbols.length, coins: symbols });
+        res.send({ quantity: symbols.length, symbols: symbols });
       });
     } catch (error) {
       log(error);
@@ -74,7 +74,6 @@ const binanceCrawler = require('../binance.crawler'),
   },
   getInfoOuterBinance = (_, res) => {
     fetchOuterBinanceSymbols((symbols) => {
-      log(symbols);
       res.send({ quantity: symbols.length, symbols: symbols });
     });
   };
@@ -83,4 +82,5 @@ module.exports = {
   getInfoBinance,
   getInfoCoinmarketcap,
   getInfoOuterBinance,
+  fetchOuterBinanceSymbols,
 };

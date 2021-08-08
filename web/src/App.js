@@ -34,7 +34,7 @@ const fetchPrice = async (market) => {
   let url = process.env.REACT_APP_API_URL;
   try {
     const response = await fetch(url + 'info/price/' + market);
-    const price = await response.json();
+    const price = (await response.json())['price'];
     return +price;
   } catch (error) {
     log(error);
@@ -232,16 +232,16 @@ function App() {
               )
             }
             onClick={async () => {
-              setIsUpdating(true)
+              setIsUpdating(true);
               dispatch(
                 updateCoins(await getCoinsWithNewPrices(currentState.entities))
               );
               //runUpdatePrices(dispatch, currentState.entities);
               log(currentState);
-              setIsUpdating(false)
+              setIsUpdating(false);
             }}
           >
-            Cập nhật
+            Cập nhật giá
           </Button>
         </Grid>
       </Grid>

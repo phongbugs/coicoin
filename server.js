@@ -92,14 +92,17 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-//require('./binance.crawler').getPrice(prices => global.PRICES = prices)
-require('./binance.crawler').run()
+let binanceCrawler = require('./binance.crawler');
+binanceCrawler.initStatistics();
+binanceCrawler.syncPrices();
+binanceCrawler.syncPriceExtraMarkets();
+
 //Whenever someone connects this gets executed
-io.on('connection', function(socket) {
+io.on('connection', function (socket) {
   console.log('A user connected');
 
   //Whenever someone disconnects this piece of code executed
   socket.on('disconnect', function () {
-     console.log('A user disconnected');
+    console.log('A user disconnected');
   });
 });

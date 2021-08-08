@@ -1,10 +1,11 @@
 const Binance = require('node-binance-api'),
   cfg = require('./config'),
-  log = console.log;
-const binance = new Binance().options({
-  APIKEY: cfg.APIKEY,
-  APISECRET: cfg.APISECRET,
-});
+  log = console.log,
+  fetch = require('node-fetch'),
+  binance = new Binance().options({
+    APIKEY: cfg.APIKEY,
+    APISECRET: cfg.APISECRET,
+  });
 function getAllMarkets(callback) {
   return binance.prices((error, ticker) => {
     try {
@@ -16,7 +17,7 @@ function getAllMarkets(callback) {
   });
 }
 const WAIT_NEXT_FETCHING = 3000; // 1 second
-async function run() {
+async function syncPrices() {
   try {
     getAllMarkets((markets) => {
       global.MARKETS = markets;
@@ -35,13 +36,56 @@ async function run() {
       new Date().toLocaleString(),
       WAIT_NEXT_FETCHING
     );
-    setTimeout(async () => await run(), WAIT_NEXT_FETCHING);
+    //setTimeout(async () => await run(), WAIT_NEXT_FETCHING);
   }
 }
+const fetchPriceFrom3rdParty = require('./cmc.crawler').fetchPriceFrom3rdParty;
+async function syncPriceExtraMarkets() {
+  if (global.EXTRAMARTKETS.length > 0) {
+    log('Extra Markets:, %s', global.EXTRAMARTKETS);
+    await Promise.all(
+      global.EXTRAMARTKETS.map(
+        async (market) =>
+          (global.MARKETS[market] = await fetchPriceFrom3rdParty(market))
+      )
+    ).then(() => {
+      log('done sync extra market');
+    });
+  } else {
+    log('No Extra market');
+  }
+  setTimeout(() => syncPriceExtraMarkets(), 5000);
+}
+async function initStatistics() {
+  global.EXTRAMARTKETS = [];
+  let env = process.env.NODE_ENV || 'development';
+  setTimeout(async () => {
+    let outerBinanceSymbols = (
+      await (
+        await fetch(cfg[env].localApiUrl + '/statistics/outerbinance')
+      ).json()
+    )['symbols'];
+    //log(outerBinanceSymbols);
+    let binanceSymbols = (
+      await (await fetch(cfg[env].localApiUrl + '/statistics/binance')).json()
+    )['symbols'];
+    //log(binanceSymbols);
 
+    global.BNBSYMBOLS = {};
+    global.OUTERBNBSYMBOLS = {};
+    outerBinanceSymbols.forEach((symbol) => {
+      global.OUTERBNBSYMBOLS[symbol] = true;
+    });
+    binanceSymbols.forEach((symbol) => {
+      global.BNBSYMBOLS[symbol] = true;
+    });
+  }, 5000);
+}
 module.exports = {
   getAllMarkets,
-  run,
+  syncPrices,
+  syncPriceExtraMarkets,
+  initStatistics,
 };
 (async () => {
   // let ticker = await binance.markets();
