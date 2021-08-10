@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import CoinComboBox from './components/CoinComboBox';
 import CoinTextField from './components/CoinTextField';
@@ -42,6 +42,7 @@ const fetchPrice = async (market) => {
     throw error;
   }
 };
+
 const fetchPrices = async (markets) => {
   let url = process.env.REACT_APP_API_URL;
   try {
@@ -50,28 +51,49 @@ const fetchPrices = async (markets) => {
     return prices;
   } catch (error) {
     log(error);
-    alert(error);
+    alert(error.message);
   }
 };
+
 const getCoinsWithNewPrices = async (coins) => {
-  let prices = await fetchPrices(coins.map((coin) => coin.s + coin.p));
-  return coins.map((coin) => {
-    let market = coin.s + coin.p;
-    let currentFund = coin.cf;
-    let price = prices[market];
-    if (price) currentFund = coin.q * price;
-    let c = { ...coin, cf: currentFund };
-    return c;
-  });
+  try {
+    let prices = await fetchPrices(coins.map((coin) => coin.s + coin.p));
+    if (prices)
+      return coins.map((coin) => {
+        let market = coin.s + coin.p;
+        let currentFund = coin.cf;
+        let price = prices[market];
+        if (price) currentFund = coin.q * price;
+        let c = { ...coin, cf: currentFund };
+        return c;
+      });
+    return coins;
+  } catch (error) {
+    alert('API Error');
+    log(error);
+  }
 };
-// function delay(second) {
-//   return new Promise((res) => setTimeout(res, second * 1000));
-// }
-// const runUpdatePrices = async (dispatch, entities) => {
-//   dispatch(updateCoins(await getCoinsWithNewPrices(entities)));
-//   await delay(2);
-//   await runUpdatePrices(dispatch, entities);
-// };
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest function.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
 function App() {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -85,14 +107,31 @@ function App() {
     (state) => ({ currentState: state.coin }),
     shallowEqual
   );
-  useEffect(() => {
-    //runUpdatePrices(dispatch, currentState.entities);
-    //dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
-    // async function updatePrices() {
-    //   await getCoinsWithNewPrices(currentState.entities);
-    // }
-    // updatePrices();
-  }, []);
+  // update state but can not update state
+  // useEffect(() => {
+  //   let interval;
+  //   if (currentState.entities) {
+  //     interval = setInterval(async () => {
+  //       setIsUpdating(true);
+  //       dispatch(
+  //         updateCoins(await getCoinsWithNewPrices(currentState.entities))
+  //       );
+  //       setIsUpdating(false);
+  //     }, 5000);
+  //   } else {
+  //     clearInterval(interval);
+  //   }
+  // }, []);
+
+  // => Custom setInterval to update state
+  // src tutorial : https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+  // src code : https://codesandbox.io/s/105x531vkq?file=/src/index.js:37-43
+  useInterval(async () => {
+    setIsUpdating(true);
+    dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
+    setIsUpdating(false);
+  }, 3000);
+
   const sendSymbol = (symbol) => {
     console.log(symbol);
     setSymbolCoin(symbol);
@@ -232,13 +271,15 @@ function App() {
               )
             }
             onClick={async () => {
-              setIsUpdating(true);
-              dispatch(
-                updateCoins(await getCoinsWithNewPrices(currentState.entities))
-              );
-              //runUpdatePrices(dispatch, currentState.entities);
-              log(currentState);
-              setIsUpdating(false);
+              setInterval(async () => {
+                setIsUpdating(true);
+                dispatch(
+                  updateCoins(
+                    await getCoinsWithNewPrices(currentState.entities)
+                  )
+                );
+                setIsUpdating(false);
+              }, 5000);
             }}
           >
             Cập nhật giá

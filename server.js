@@ -94,7 +94,7 @@ function onListening() {
 
 let binanceCrawler = require('./binance.crawler');
 binanceCrawler.initStatistics();
-binanceCrawler.syncPrices();
+binanceCrawler.syncBNBMarkets();
 binanceCrawler.syncPriceExtraMarkets();
 
 //Whenever someone connects this gets executed

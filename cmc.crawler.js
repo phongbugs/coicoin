@@ -10,15 +10,12 @@ async function fetchPriceFrom3rdParty(market) {
         end: new Date().getTime(),
         currency: market.substr(market.length - 4, 3),
       });
-    log(url);
     const response = await fetch(url);
     const prices = await response.json();
-    //log(prices);
     let lastPrice = prices.data[0].rate;
     if (!global.EXTRAMARTKETS.includes(market))
       global.EXTRAMARTKETS.push(market);
     global.MARKETS[market] = lastPrice + '';
-    log(lastPrice);
     return lastPrice;
   } catch (error) {
     log(market);

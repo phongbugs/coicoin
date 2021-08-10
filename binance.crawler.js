@@ -5,7 +5,12 @@ const Binance = require('node-binance-api'),
   binance = new Binance().options({
     APIKEY: cfg.APIKEY,
     APISECRET: cfg.APISECRET,
-  });
+  }),
+  fetchPriceFrom3rdParty = require('./cmc.crawler').fetchPriceFrom3rdParty;
+
+const TIMEOUT_SYNC_BNBMARKET = 5000,
+  TIMEOUT_SYNC_EXTRAMARKET = 30000;
+
 function getAllMarkets(callback) {
   return binance.prices((error, ticker) => {
     try {
@@ -16,30 +21,30 @@ function getAllMarkets(callback) {
     }
   });
 }
-const WAIT_NEXT_FETCHING = 3000; // 1 second
-async function syncPrices() {
+
+async function syncBNBMarkets() {
   try {
     getAllMarkets((markets) => {
       global.MARKETS = markets;
       log(
         '%s: waiting after %s',
         new Date().toLocaleString(),
-        WAIT_NEXT_FETCHING
+        TIMEOUT_SYNC_BNBMARKET
       );
       log(markets.BTCUSDT);
-      //setTimeout(async () => await run(), WAIT_NEXT_FETCHING);
+      setTimeout(async () => await syncBNBMarkets(), TIMEOUT_SYNC_BNBMARKET);
     });
   } catch (error) {
     log(error);
     log(
       '%s: waiting after %s',
       new Date().toLocaleString(),
-      WAIT_NEXT_FETCHING
+      TIMEOUT_SYNC_BNBMARKET
     );
-    //setTimeout(async () => await run(), WAIT_NEXT_FETCHING);
+    setTimeout(async () => await syncBNBMarkets(), TIMEOUT_SYNC_BNBMARKET);
   }
 }
-const fetchPriceFrom3rdParty = require('./cmc.crawler').fetchPriceFrom3rdParty;
+
 async function syncPriceExtraMarkets() {
   if (global.EXTRAMARTKETS.length > 0) {
     log('Extra Markets:, %s', global.EXTRAMARTKETS);
@@ -54,8 +59,9 @@ async function syncPriceExtraMarkets() {
   } else {
     log('No Extra market');
   }
-  setTimeout(() => syncPriceExtraMarkets(), 5000);
+  setTimeout(() => syncPriceExtraMarkets(), TIMEOUT_SYNC_EXTRAMARKET);
 }
+
 async function initStatistics() {
   global.EXTRAMARTKETS = [];
   let env = process.env.NODE_ENV || 'development';
@@ -81,9 +87,10 @@ async function initStatistics() {
     });
   }, 5000);
 }
+
 module.exports = {
   getAllMarkets,
-  syncPrices,
+  syncBNBMarkets,
   syncPriceExtraMarkets,
   initStatistics,
 };
