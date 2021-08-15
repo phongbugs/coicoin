@@ -14,18 +14,26 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { addCoin, updateCoins } from './redux/slice';
 import { Coins } from './data/coin.map';
 import fetch from 'node-fetch';
+import Switcher from './components/Switcher';
+import CountDown from './components/CountDown';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     textAlign: 'center',
     padding: '10px',
   },
-  input: {
-    color: 'white',
-  },
+  // input: {
+  //   color: 'white',
+  // },
   button: {
     backgroundColor: '#468446',
     color: '#821515',
+  },
+  btnCoin: {
+    height: '39px',
+    background: '#2c732c',
+    color: 'rgb(222 222 222)',
+    fontWeight: 'bold',
   },
 }));
 const log = console.log;
@@ -38,7 +46,7 @@ const fetchPrice = async (market) => {
     return +price;
   } catch (error) {
     log(error);
-    alert('API Service error');
+    //alert('API Service error');
     throw error;
   }
 };
@@ -51,7 +59,7 @@ const fetchPrices = async (markets) => {
     return prices;
   } catch (error) {
     log(error);
-    alert(error.message);
+    //alert(error.message);
   }
 };
 
@@ -103,6 +111,9 @@ function App() {
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
   const [symbolCoinPair, setSymbolCoinPair] = useState('USDT');
+  const [countRefresh, setCountRefresh] = useState(
+    process.env.REACT_APP_SYNC_PRICE_TIMEOUT / 1000
+  );
   let { currentState } = useSelector(
     (state) => ({ currentState: state.coin }),
     shallowEqual
@@ -127,11 +138,17 @@ function App() {
   // src tutorial : https://overreacted.io/making-setinterval-declarative-with-react-hooks/
   // src code : https://codesandbox.io/s/105x531vkq?file=/src/index.js:37-43
   useInterval(async () => {
-    setIsUpdating(true);
-    dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
-    setIsUpdating(false);
-  }, 3000);
+    if (currentState.entities.length > 0)
+      dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
+  }, process.env.REACT_APP_SYNC_PRICE_TIMEOUT);
 
+  useEffect(() => {
+    async function updatePriceStartingApp() {
+      dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
+    }
+    updatePriceStartingApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const sendSymbol = (symbol) => {
     console.log(symbol);
     setSymbolCoin(symbol);
@@ -154,7 +171,6 @@ function App() {
   const getCoin = async (symbol) => {
     let coin = null;
     if (isValidForm()) {
-      console.log(symbol);
       coin = Coins.find((coin) => coin.s === symbol.toUpperCase());
       if (coin) {
         coin['p'] = 'USDT';
@@ -194,7 +210,7 @@ function App() {
           <CoinTextField
             size='small'
             id='txtQuantity'
-            label='Số lượng coin'
+            label='Số lượng'
             type='number'
             // InputLabelProps={{
             //   shrink: true,
@@ -242,18 +258,26 @@ function App() {
               )
             }
             onClick={async () => {
-              setIsAdding(true);
-              dispatch(addCoin(await getCoin(symbolCoin)));
-              setIsAdding(false);
+              let coin = await getCoin(symbolCoin);
+              if (coin)
+                if (
+                  currentState.entities.length > 0 &&
+                  currentState.entities.findIndex(
+                    (entity) => entity.s === coin.s && entity.p === coin.p
+                  ) === -1
+                ) {
+                  setIsAdding(true);
+                  dispatch(addCoin(coin));
+                  setIsAdding(false);
+                } else {
+                  alert('Đã có coin, xóa để thêm lại');
+                }
             }}
           >
             Thêm
           </Button>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <CoinList />
-        </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
           <Button
             fullWidth
             style={{
@@ -262,6 +286,7 @@ function App() {
               color: 'rgb(222 222 222)',
               fontWeight: 'bold',
             }}
+            //className={classes.btnCoin}
             variant='contained'
             startIcon={
               isUpdating ? (
@@ -271,19 +296,25 @@ function App() {
               )
             }
             onClick={async () => {
-              setInterval(async () => {
-                setIsUpdating(true);
-                dispatch(
-                  updateCoins(
-                    await getCoinsWithNewPrices(currentState.entities)
-                  )
-                );
-                setIsUpdating(false);
-              }, 5000);
+              setIsUpdating(true);
+              setCountRefresh(process.env.REACT_APP_SYNC_PRICE_TIMEOUT/1000)
+              dispatch(
+                updateCoins(await getCoinsWithNewPrices(currentState.entities))
+              );
+              setIsUpdating(false);
             }}
           >
-            Cập nhật giá
+            (<CountDown countdown={countRefresh} />)
           </Button>
+        </Grid>
+        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+          <Switcher label='Price' />
+        </Grid>
+        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+          <Switcher label='DCA' mode='on' />
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <CoinList />
         </Grid>
       </Grid>
     </div>

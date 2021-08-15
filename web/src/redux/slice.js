@@ -3,20 +3,160 @@ export const slice = createSlice({
   name: 'coin',
   initialState: {
     btnAddIsLoading: false,
+    btnIsUpdating: false,
     errorMessage: '',
     entities: [
-        //{ i: 1, s: 'BTC', p:'USDT', n: 'Bitcoin', of:900.5, q: 0.030075, cf: 893.32 },
-        { i: 1839, s: 'BNB', p:'USDT', n: 'Binance Coin', of: 1001, q:2.31877675, cf: 762.58 },
-        { i: 1027, s: 'ETH', p:'USDT', n: 'Etherum', of: 863, q:0.30307844, cf: 591 },
-        { i: 52, s: 'XRP', p:'USDT', n: 'Ripple', of: 1340, q: 1009.06288, cf: 528.71 },
-        { i: 3890, s: 'MATIC', p:'USDT', n: 'Polygon', of: 767, q: 413.2, cf: 476 },
-        { i: 8757, s: 'SAFEMOON', p:'USDT', n: 'SafeMoon', of: 267, q: 97297673, cf: 236 },
-        { i: 9119, s: 'TLM', p:'USDT', n: 'Alen Worlds', of: 310, q: 818.76057, cf: 111.38 },
-        { i: 3718, s: 'BTT', p:'USDT', n: 'Bittorrent', of: 288, q: 51412.536, cf: 99.01 },
-        { i: 2010, s: 'ADA', p:'USDT', n: 'Cardano', of: 100, q: 60.17976, cf: 68.08},
-        { i: 4206, s: 'WIN', p:'USDT', n: 'WINK', of: 116.15, q: 112945.941, cf: 30.55 },
-        { i: 825, s: 'USDT', p:'USDT', n: 'TetherUS', of: 1123, q: 1123.43951374, cf: 2 },
-      ],
+      //{ i: 1, s: 'BTC', p:'USDT', n: 'Bitcoin', of:900.5, q: 0.030075, cf: 893.32 },
+      {
+        i: 1839,
+        s: 'BNB',
+        p: 'USDT',
+        n: 'Binance Coin',
+        of: 1001,
+        q: 2.15556398,
+        cf: 762.58,
+      },
+      // {
+      //   i: 1027,
+
+      //   s: 'ETH',
+      //   p: 'USDT',
+      //   n: 'Etherum',
+      //   of: 2000 - 936,
+      //   q: 0.60145844 - 0.29071,
+      //   cf: 591,
+      // },
+      {
+        i: 52,
+        s: 'XRP',
+        p: 'USDT',
+        n: 'Ripple',
+        of: 2458+708,
+        q: 2370.05327,
+        cf: 528.71,
+      },
+      {
+        i: 52,
+        s: 'XRP',
+        p: 'USDT',
+        n: 'Ripple',
+        of: 1458,
+        q: 1009,
+        cf: 528.71,
+      },
+      {
+        i: 52,
+        s: 'XRP',
+        p: 'USDT',
+        n: 'Ripple',
+        of: 1000,
+        q: 825.62,
+        cf: 528.71,
+      },
+      {
+        i: 52,
+        s: 'XRP',
+        p: 'USDT',
+        n: 'Ripple',
+        of: 708.855,
+        q: 535.67,
+        cf: 528.71,
+      },
+      {
+        cf: 594.360723,
+        i: 1765,
+        n: 'EOS',
+        of: 500,
+        p: 'USDT',
+        q: 93.98,
+        r: 27,
+        s: 'EOS',
+      },
+
+      {
+        i: 2010,
+        s: 'ADA',
+        p: 'USDT',
+        n: 'Cardano',
+        of: 200,
+        q: 91.00976,
+        cf: 68.08,
+      },
+      {
+        i: 3890,
+        s: 'MATIC',
+        p: 'USDT',
+        n: 'Polygon',
+        of: 200,
+        q: 136.9,
+        cf: 0,
+      },
+      {
+        i: 512,
+        n: 'Stellar',
+        s: 'XLM',
+        r: 20,
+        p: 'USDT',
+        q: 507.30,
+        of: 200,
+        cf: 0.39776,
+      },
+      {
+        i: 825,
+        s: 'USDT',
+        p: 'USDT',
+        n: 'TetherUS',
+        of: 908,
+        q: 708.754296,
+        cf: 908,
+      },
+
+      {
+        i: 9119,
+        s: 'TLM',
+        p: 'USDT',
+        n: 'Alen Worlds',
+        of: 310,
+        q: 818.76057,
+        cf: 111.38,
+      },
+      {
+        i: 3718,
+        s: 'BTT',
+        p: 'USDT',
+        n: 'Bittorrent',
+        of: 288,
+        q: 51412.536,
+        cf: 99.01,
+      },
+      {
+        i: 4206,
+        s: 'WIN',
+        p: 'USDT',
+        n: 'WINK',
+        of: 116.15,
+        q: 112945.941,
+        cf: 30.55,
+      },
+      {
+        i: 8757,
+        s: 'SAFEMOON',
+        p: 'USDT',
+        n: 'SafeMoon',
+        of: 267,
+        q: 97297673,
+        cf: 236,
+      },
+      {
+        i: 8916,
+        s: 'ICP',
+        p: 'USDT',
+        n: 'Internet Computer',
+        of: 210,
+        q: 0.0001,
+        cf: 30.55,
+      },
+    ],
     // originalFund:0,
     // quantityCoin:0,
     // symbolCoin:'',
@@ -31,7 +171,13 @@ export const slice = createSlice({
       if (action.payload) {
         console.log(action.payload);
         let coin = { ...action.payload };
-        state.entities.push(coin);
+        if (
+          state.entities.length > 0 &&
+          state.entities.findIndex(
+            (entity) => entity.s === coin.s && entity.p === coin.p
+          ) === -1
+        )
+          state.entities.push(coin);
       }
     },
 
@@ -39,10 +185,14 @@ export const slice = createSlice({
 
     updateCoins: (state, { payload }) => ({
       ...state,
-      entities: payload
+      entities: payload,
     }),
     removeCoin: (state, action) => {
-      state.entities.splice(0, 1);
+      let { symbol, pair } = action.payload;
+      let coinIndex = state.entities.findIndex(
+        (entity) => entity.s === symbol && entity.p === pair
+      );
+      state.entities.splice(coinIndex, 1);
       //console.log(action);
     },
   },

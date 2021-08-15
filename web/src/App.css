@@ -44,3 +44,7 @@ input[type=number]::-webkit-inner-spin-button {
     margin: 0;
 }
 input.MuiInputBase-input{color: white;}
+.MuiListItem-gutters {
+  padding-left: 9px !important;
+  padding-right: 9px !important;
+}

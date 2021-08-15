@@ -8,7 +8,6 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
-//import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { entities, removeCoin } from '../redux/slice';
 import { useSelector, useDispatch } from 'react-redux';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
@@ -30,6 +29,7 @@ export default function CoinList() {
     widthCoinIcon = '32px',
     heightCoinIcon = '32px';
   let coinItems = [];
+
   let trendingIcon = (profix) =>
     profix > 0 ? (
       <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
@@ -42,11 +42,13 @@ export default function CoinList() {
       backgroundColor: 'transparent',
     },
   })(ListItemText);
+
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
   });
+
   const formatOriginalFund = (fund) => {
     if (fund % 1 === 0)
       return (
@@ -55,7 +57,9 @@ export default function CoinList() {
       );
     return formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
   };
-  const formatCurentFund = (fund) => {
+
+  const formatCurentFund = (record) => {
+    let fund = record.cf;
     if (fund % 1 === 0)
       fund =
         formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
@@ -67,11 +71,14 @@ export default function CoinList() {
         {fund}
         <DeleteIcon
           style={{ float: 'right', color: '#ab2828', cursor: 'pointer' }}
-          onClick={() => dispatch(removeCoin({ symbol: 'BTC', pair: 'USDT' }))}
+          onClick={() =>
+            dispatch(removeCoin({ symbol: record.s, pair: record.p }))
+          }
         />
       </>
     );
   };
+
   const formatQuantityCoin = (quantity) => {
     if (quantity >= 1000000) quantity = (quantity / 1000000).toFixed(2) + 'M';
     else if (quantity >= 100000) quantity = (quantity / 1000).toFixed(2) + 'K';
@@ -80,10 +87,25 @@ export default function CoinList() {
       quantity = formatter.format(quantity).replace('$', '').replace('.00', '');
     return quantity;
   };
+
   const formatSymbolCoin = (symbol) => {
-    if(symbol.length > 5) symbol = symbol.substring(0,5) + '...'
+    if (symbol.length > 5) symbol = symbol.substring(0, 5) + '...';
     return symbol;
   };
+  const formatNameCoin = (name) => {
+    switch (name) {
+      case 'Binance Coin':
+        name = 'Binance';
+        break;
+      case 'Internet Computer':
+        name = 'Internet...';
+        break;
+      default:
+        break;
+    }
+    return name;
+  };
+
   const formatProfix = (profix, profixPercent) => {
     return (
       <Typography
@@ -94,10 +116,14 @@ export default function CoinList() {
       >
         {trendingIcon(profix)}
         {' ' + formatOriginalFund(Math.abs(profix))} (
-        <i>{(Math.abs(profixPercent) * 100).toFixed(1)}%</i>)
+        <i style={{ fontSize: '11px', fontWeight: 'bold' }}>
+          {(Math.abs(profixPercent) * 100).toFixed(1)}%
+        </i>
+        )
       </Typography>
     );
   };
+
   if (data.length > 0) {
     coinItems = data.map((record, index) => {
       let profix = record.cf - record.of,
@@ -119,7 +145,7 @@ export default function CoinList() {
           <CoinListItemText
             style={{ width: '25%' }}
             primary={formatSymbolCoin(record.s)}
-            secondary={record.n}
+            secondary={formatNameCoin(record.n)}
           />
           {/* Quantity Coin & Original Fund */}
           <CoinListItemText
@@ -132,7 +158,7 @@ export default function CoinList() {
           <CoinListItemText
             style={{ width: '50%' }}
             primary={formatProfix(profix, profixPercent)}
-            secondary={formatCurentFund(record.cf)}
+            secondary={formatCurentFund(record)}
           />
           {/* <DeleteIcon color="secondary" /> */}
           {/* <ListItemSecondaryAction>

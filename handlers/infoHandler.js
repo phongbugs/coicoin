@@ -1,6 +1,6 @@
 const log = console.log,
   fetch = require('node-fetch'),
-  fetchPriceFrom3rdParty = require('../cmc.crawler').fetchPriceFrom3rdParty;
+  fetchPriceFrom3rdParty = require('../crawler.cmc').fetchPriceFrom3rdParty;
 
 async function fetchPrice(req, res) {
   let market = req.params.market;

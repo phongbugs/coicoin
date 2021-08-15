@@ -92,7 +92,7 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-let binanceCrawler = require('./binance.crawler');
+let binanceCrawler = require('./crawler.binance');
 binanceCrawler.initStatistics();
 binanceCrawler.syncBNBMarkets();
 binanceCrawler.syncPriceExtraMarkets();

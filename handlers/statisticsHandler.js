@@ -5,7 +5,7 @@
  *      symbols : ['BTC', 'BNB'],
  * }
  */
-const getAllMarkets = require('../binance.crawler').getAllMarkets,
+const getAllMarkets = require('../crawler.binance').getAllMarkets,
   log = console.log,
   fetch = require('node-fetch'),
   fetchBinanceSymbolCoins = (callback) => {

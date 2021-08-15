@@ -6,10 +6,11 @@ const Binance = require('node-binance-api'),
     APIKEY: cfg.APIKEY,
     APISECRET: cfg.APISECRET,
   }),
-  fetchPriceFrom3rdParty = require('./cmc.crawler').fetchPriceFrom3rdParty;
+  fetchPriceFrom3rdParty = require('./crawler.cmc').fetchPriceFrom3rdParty;
 
-const TIMEOUT_SYNC_BNBMARKET = 5000,
-  TIMEOUT_SYNC_EXTRAMARKET = 30000;
+const TIMEOUT_SYNC_BNBMARKET = 60000,
+  TIMEOUT_SYNC_EXTRAMARKET = 300000,
+  TIMEOUT_START_INIT_SYMBOLS = 30000;
 
 function getAllMarkets(callback) {
   return binance.prices((error, ticker) => {
@@ -85,7 +86,7 @@ async function initStatistics() {
     binanceSymbols.forEach((symbol) => {
       global.BNBSYMBOLS[symbol] = true;
     });
-  }, 5000);
+  }, TIMEOUT_START_INIT_SYMBOLS);
 }
 
 module.exports = {
