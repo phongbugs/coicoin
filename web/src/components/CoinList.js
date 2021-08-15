@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -9,7 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { entities, removeCoin } from '../redux/slice';
-import { useSelector, useDispatch } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 const useStyles = makeStyles((theme) => ({
@@ -28,6 +28,16 @@ export default function CoinList() {
     extensionCoinIcon = '.png',
     widthCoinIcon = '32px',
     heightCoinIcon = '32px';
+  let { isShowPrice, isShowPercent } = useSelector(
+    (state) => ({
+      isShowPrice: state.coin.isShowPrice,
+      isShowPercent: state.coin.isShowPercent,
+    }),
+    shallowEqual
+  );
+  useEffect(() => {
+    console.log('CoinList.isShowPrice:%s', isShowPrice);
+  }, [isShowPrice]);
   let coinItems = [];
 
   let trendingIcon = (profix) =>
@@ -115,15 +125,37 @@ export default function CoinList() {
         }}
       >
         {trendingIcon(profix)}
-        {' ' + formatOriginalFund(Math.abs(profix))} (
-        <i style={{ fontSize: '11px', fontWeight: 'bold' }}>
-          {(Math.abs(profixPercent) * 100).toFixed(1)}%
-        </i>
-        )
+        {' ' + formatOriginalFund(Math.abs(profix)) + ' '}
+        {formatProfixPercent(profixPercent)}
       </Typography>
     );
   };
-
+  const formatPrice = (price) => {
+    return (
+      <Typography
+        style={{
+          color: price < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
+          fontSize: '0.875rem',
+        }}
+      >
+        {trendingIcon(price)}
+        {' ' + price.toString().substring(0, 10)} $
+      </Typography>
+    );
+  };
+  const formatProfixPercent = (profixPercent) => {
+    return isShowPercent ? (
+      <>
+        (
+        <i style={{ fontSize: '11px', fontWeight: 'bold' }}>
+          {(Math.abs(profixPercent) * 100).toFixed(1) + '%'}
+        </i>
+        )
+      </>
+    ) : (
+      ''
+    );
+  };
   if (data.length > 0) {
     coinItems = data.map((record, index) => {
       let profix = record.cf - record.of,
@@ -157,7 +189,11 @@ export default function CoinList() {
           {/* Percent Profix & Current Fund */}
           <CoinListItemText
             style={{ width: '50%' }}
-            primary={formatProfix(profix, profixPercent)}
+            primary={
+              isShowPrice
+                ? formatPrice(record.price)
+                : formatProfix(profix, profixPercent)
+            }
             secondary={formatCurentFund(record)}
           />
           {/* <DeleteIcon color="secondary" /> */}

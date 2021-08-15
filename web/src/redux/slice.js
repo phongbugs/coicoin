@@ -4,7 +4,8 @@ export const slice = createSlice({
   initialState: {
     btnAddIsLoading: false,
     btnIsUpdating: false,
-    isDCAMode: true,
+    isShowPrice: false,
+    isShowPercent: true,
     errorMessage: '',
     entities: [
       //{ i: 1, s: 'BTC', p:'USDT', n: 'Bitcoin', of:900.5, q: 0.030075, cf: 893.32 },
@@ -187,18 +188,51 @@ export const slice = createSlice({
       ...state,
       entities: payload,
     }),
+    showPrice: (state) => ({
+      ...state,
+      isShowPrice: true,
+    }),
+    hidePrice: (state) => ({
+      ...state,
+      isShowPrice: false,
+    }),
+    showPercent: (state) => ({
+      ...state,
+      isShowPercent: true,
+    }),
+    hidePercent: (state) => ({
+      ...state,
+      isShowPercent: false,
+    }),
     removeCoin: (state, action) => {
       let { symbol, pair } = action.payload;
       let coinIndex = state.entities.findIndex(
         (entity) => entity.s === symbol && entity.p === pair
       );
       state.entities.splice(coinIndex, 1);
-      //console.log(action);
     },
+    // removeCoin: (state, { payload }) => ({
+    //   ...state,
+    //   entities: state.entities.splice(
+    //     state.entities.findIndex(
+    //       (entity) => entity.s === payload.symbol && entity.p === payload.pair
+    //     ),
+    //     1
+    //   ),
+    // }),
   },
 });
 
-export const { addCoin, removeCoin, updateCoins, getCoins } = slice.actions;
+export const {
+  addCoin,
+  removeCoin,
+  updateCoins,
+  getCoins,
+  hidePrice,
+  showPrice,
+  hidePercent,
+  showPercent,
+} = slice.actions;
 
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This

@@ -11,7 +11,14 @@ import CoinList from './components/CoinList';
 import PairComboBox from './components/PairComboBox';
 import { makeStyles } from '@material-ui/core/styles';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { addCoin, updateCoins } from './redux/slice';
+import {
+  addCoin,
+  updateCoins,
+  hidePrice,
+  showPrice,
+  hidePercent,
+  showPercent,
+} from './redux/slice';
 import { Coins } from './data/coin.map';
 import fetch from 'node-fetch';
 import Switcher from './components/Switcher';
@@ -69,7 +76,7 @@ const getCoinsWithNewPrices = async (coins) => {
         let currentFund = coin.cf;
         let price = prices[market];
         if (price) currentFund = coin.q * price;
-        let c = { ...coin, cf: currentFund };
+        let c = { ...coin, cf: currentFund, price: price };
         return c;
       });
     return coins;
@@ -128,11 +135,11 @@ function App() {
     async function updatePriceStartingApp() {
       dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
     }
-    setDefaultConfig();
+    setDefaultConfigs();
     updatePriceStartingApp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  function setDefaultConfig() {
+  function setDefaultConfigs() {
     setModeDCA('on');
   }
   const sendSymbol = (symbol) => {
@@ -143,6 +150,14 @@ function App() {
   };
   const sendModeDCA = (mode) => {
     setModeDCA(mode);
+  };
+  const sendModePrice = (mode) => {
+    if (mode === 'on') dispatch(showPrice());
+    else dispatch(hidePrice());
+  };
+  const sendModePercent = (mode) => {
+    if (mode === 'on') dispatch(showPercent());
+    else dispatch(hidePercent());
   };
   const isValidForm = () => {
     if (originalFund === '' || quantityCoin === '' || symbolCoin === '') {
@@ -168,6 +183,7 @@ function App() {
           (symbolCoin === 'SMN' ? 'SAFEMOON' : symbolCoin) + symbolCoinPair;
         let price = await fetchPrice(market);
         coin['cf'] = price * +quantityCoin;
+        coin['price'] = price;
       }
     }
     return coin;
@@ -251,14 +267,16 @@ function App() {
               if (coin) {
                 if (modeDCA === 'off') {
                   if (
-                    currentState.entities.length > 0 &&
+                    currentState.entities.length >= 0 &&
                     currentState.entities.findIndex(
                       (entity) => entity.s === coin.s && entity.p === coin.p
                     ) === -1
                   ) {
                     dispatch(addCoin(coin));
                   } else {
-                    alert(`Đồng ${coin.s} đã có trong danh sách, xóa để thêm lại hoặc bật DCA`);
+                    alert(
+                      `Đồng ${coin.s} đã có trong danh sách, xóa để thêm lại hoặc bật DCA`
+                    );
                   }
                 } else if (modeDCA === 'on') {
                   dispatch(addCoin(coin));
@@ -270,7 +288,7 @@ function App() {
             Thêm
           </Button>
         </Grid>
-        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             style={{
@@ -281,7 +299,7 @@ function App() {
             }}
             //className={classes.btnCoin}
             variant='contained'
-            startIcon={
+            endIcon={
               isUpdating ? (
                 <CircularProgress size={20} style={{ color: '#fff' }} />
               ) : (
@@ -297,14 +315,21 @@ function App() {
               setIsUpdating(false);
             }}
           >
-            [<CountDown countdown={countRefresh} />]
+            <CountDown countdown={countRefresh} />
           </Button>
         </Grid>
-        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
-          <Switcher label='Price' />
-        </Grid>
-        <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
+        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <Switcher label='DCA' mode='on' sendMode={sendModeDCA} />
+        </Grid>
+        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+          <Switcher label='%' mode='on' sendMode={sendModePercent} />
+        </Grid>
+        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+          <Switcher
+            label='Price'
+            mode={currentState.isShowPrice ? 'on' : 'off'}
+            sendMode={sendModePrice}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <CoinList />
