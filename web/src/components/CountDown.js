@@ -11,7 +11,7 @@ export default function CountDown({ countdown }) {
     if (timeLeft > 0) {
       timerRef.current = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     } else setTimeLeft(countdown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
-
   return <>{timeLeft}</>;
 }

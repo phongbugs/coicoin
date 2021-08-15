@@ -43,7 +43,12 @@ export default function CustomizedSwitches(props) {
         control={
           <PurpleSwitch
             checked={state.checkedA}
-            onChange={handleChange}
+            onChange={(e) => {
+              let mode = e.target.checked ? 'on' : 'off';
+              //console.log('-> ' + mode)
+              props.sendMode(mode);
+              handleChange(e);
+            }}
             name='checkedA'
           />
         }

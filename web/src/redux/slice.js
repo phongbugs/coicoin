@@ -4,6 +4,7 @@ export const slice = createSlice({
   initialState: {
     btnAddIsLoading: false,
     btnIsUpdating: false,
+    isDCAMode: true,
     errorMessage: '',
     entities: [
       //{ i: 1, s: 'BTC', p:'USDT', n: 'Bitcoin', of:900.5, q: 0.030075, cf: 893.32 },
@@ -31,7 +32,7 @@ export const slice = createSlice({
         s: 'XRP',
         p: 'USDT',
         n: 'Ripple',
-        of: 2458+708,
+        of: 2458 + 708,
         q: 2370.05327,
         cf: 528.71,
       },
@@ -97,7 +98,7 @@ export const slice = createSlice({
         s: 'XLM',
         r: 20,
         p: 'USDT',
-        q: 507.30,
+        q: 507.3,
         of: 200,
         cf: 0.39776,
       },
@@ -171,13 +172,12 @@ export const slice = createSlice({
       if (action.payload) {
         console.log(action.payload);
         let coin = { ...action.payload };
-        if (
-          state.entities.length > 0 &&
-          state.entities.findIndex(
-            (entity) => entity.s === coin.s && entity.p === coin.p
-          ) === -1
-        )
-          state.entities.push(coin);
+        state.entities.push(coin);
+        state.btnAddIsLoading = false;
+        // return {
+        //   ...state,
+        //   btnAddIsLoading: false,
+        // };
       }
     },
 

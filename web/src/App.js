@@ -22,9 +22,6 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     padding: '10px',
   },
-  // input: {
-  //   color: 'white',
-  // },
   button: {
     backgroundColor: '#468446',
     color: '#821515',
@@ -110,6 +107,7 @@ function App() {
   const [quantityCoin, setQuantityCoin] = useState('');
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
+  const [modeDCA, setModeDCA] = useState('');
   const [symbolCoinPair, setSymbolCoinPair] = useState('USDT');
   const [countRefresh, setCountRefresh] = useState(
     process.env.REACT_APP_SYNC_PRICE_TIMEOUT / 1000
@@ -118,22 +116,6 @@ function App() {
     (state) => ({ currentState: state.coin }),
     shallowEqual
   );
-  // update state but can not update state
-  // useEffect(() => {
-  //   let interval;
-  //   if (currentState.entities) {
-  //     interval = setInterval(async () => {
-  //       setIsUpdating(true);
-  //       dispatch(
-  //         updateCoins(await getCoinsWithNewPrices(currentState.entities))
-  //       );
-  //       setIsUpdating(false);
-  //     }, 5000);
-  //   } else {
-  //     clearInterval(interval);
-  //   }
-  // }, []);
-
   // => Custom setInterval to update state
   // src tutorial : https://overreacted.io/making-setinterval-declarative-with-react-hooks/
   // src code : https://codesandbox.io/s/105x531vkq?file=/src/index.js:37-43
@@ -146,16 +128,21 @@ function App() {
     async function updatePriceStartingApp() {
       dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
     }
+    setDefaultConfig();
     updatePriceStartingApp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  function setDefaultConfig() {
+    setModeDCA('on');
+  }
   const sendSymbol = (symbol) => {
-    console.log(symbol);
     setSymbolCoin(symbol);
   };
   const sendSymbolPair = (symbol) => {
-    console.log(symbol);
     setSymbolCoinPair(symbol);
+  };
+  const sendModeDCA = (mode) => {
+    setModeDCA(mode);
   };
   const isValidForm = () => {
     if (originalFund === '' || quantityCoin === '' || symbolCoin === '') {
@@ -257,21 +244,27 @@ function App() {
                 <AddIcon />
               )
             }
+            disabled={isAdding}
             onClick={async () => {
+              setIsAdding(true);
               let coin = await getCoin(symbolCoin);
-              if (coin)
-                if (
-                  currentState.entities.length > 0 &&
-                  currentState.entities.findIndex(
-                    (entity) => entity.s === coin.s && entity.p === coin.p
-                  ) === -1
-                ) {
-                  setIsAdding(true);
+              if (coin) {
+                if (modeDCA === 'off') {
+                  if (
+                    currentState.entities.length > 0 &&
+                    currentState.entities.findIndex(
+                      (entity) => entity.s === coin.s && entity.p === coin.p
+                    ) === -1
+                  ) {
+                    dispatch(addCoin(coin));
+                  } else {
+                    alert(`Đồng ${coin.s} đã có trong danh sách, xóa để thêm lại hoặc bật DCA`);
+                  }
+                } else if (modeDCA === 'on') {
                   dispatch(addCoin(coin));
-                  setIsAdding(false);
-                } else {
-                  alert('Đã có coin, xóa để thêm lại');
                 }
+              }
+              setIsAdding(false);
             }}
           >
             Thêm
@@ -297,21 +290,21 @@ function App() {
             }
             onClick={async () => {
               setIsUpdating(true);
-              setCountRefresh(process.env.REACT_APP_SYNC_PRICE_TIMEOUT/1000)
+              setCountRefresh(process.env.REACT_APP_SYNC_PRICE_TIMEOUT / 1000);
               dispatch(
                 updateCoins(await getCoinsWithNewPrices(currentState.entities))
               );
               setIsUpdating(false);
             }}
           >
-            (<CountDown countdown={countRefresh} />)
+            [<CountDown countdown={countRefresh} />]
           </Button>
         </Grid>
         <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
           <Switcher label='Price' />
         </Grid>
         <Grid item xs={4} sm={4} md={4} lg={4} xl={4}>
-          <Switcher label='DCA' mode='on' />
+          <Switcher label='DCA' mode='on' sendMode={sendModeDCA} />
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <CoinList />
