@@ -18,6 +18,7 @@ import {
   showPrice,
   hidePercent,
   showPercent,
+  backupMarkets,
 } from './redux/slice';
 import { Coins } from './data/coin.map';
 import fetch from 'node-fetch';
@@ -58,7 +59,9 @@ const fetchPrice = async (market) => {
 const fetchPrices = async (markets) => {
   let url = process.env.REACT_APP_API_URL;
   try {
-    const response = await fetch(url + 'info/prices/' + markets.toString());
+    const response = await fetch(
+      url + 'info/prices/' + [...new Set(markets)].toString()
+    );
     const prices = await response.json();
     return prices;
   } catch (error) {
@@ -127,8 +130,10 @@ function App() {
   // src tutorial : https://overreacted.io/making-setinterval-declarative-with-react-hooks/
   // src code : https://codesandbox.io/s/105x531vkq?file=/src/index.js:37-43
   useInterval(async () => {
-    if (currentState.entities.length > 0)
+    if (currentState.entities.length > 0) {
+      dispatch(backupMarkets());
       dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
+    }
   }, process.env.REACT_APP_SYNC_PRICE_TIMEOUT);
 
   useEffect(() => {
@@ -309,6 +314,7 @@ function App() {
             onClick={async () => {
               setIsUpdating(true);
               setCountRefresh(process.env.REACT_APP_SYNC_PRICE_TIMEOUT / 1000);
+              dispatch(backupMarkets());
               dispatch(
                 updateCoins(await getCoinsWithNewPrices(currentState.entities))
               );
@@ -326,7 +332,7 @@ function App() {
         </Grid>
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <Switcher
-            label='Price'
+            label='Giá'
             mode={currentState.isShowPrice ? 'on' : 'off'}
             sendMode={sendModePrice}
           />

@@ -48,3 +48,6 @@ input.MuiInputBase-input{color: white;}
   padding-left: 9px !important;
   padding-right: 9px !important;
 }
+.MuiListItemAvatar-root {
+  min-width: 50px !important;
+}

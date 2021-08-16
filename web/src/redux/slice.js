@@ -6,6 +6,7 @@ export const slice = createSlice({
     btnIsUpdating: false,
     isShowPrice: false,
     isShowPercent: true,
+    prevMarkets: {},
     errorMessage: '',
     entities: [
       //{ i: 1, s: 'BTC', p:'USDT', n: 'Bitcoin', of:900.5, q: 0.030075, cf: 893.32 },
@@ -103,15 +104,15 @@ export const slice = createSlice({
         of: 200,
         cf: 0.39776,
       },
-      {
-        i: 825,
-        s: 'USDT',
-        p: 'USDT',
-        n: 'TetherUS',
-        of: 908,
-        q: 708.754296,
-        cf: 908,
-      },
+      // {
+      //   i: 825,
+      //   s: 'USDT',
+      //   p: 'USDT',
+      //   n: 'TetherUS',
+      //   of: 908,
+      //   q: 708.754296,
+      //   cf: 908,
+      // },
 
       {
         i: 9119,
@@ -149,15 +150,15 @@ export const slice = createSlice({
         q: 97297673,
         cf: 236,
       },
-      {
-        i: 8916,
-        s: 'ICP',
-        p: 'USDT',
-        n: 'Internet Computer',
-        of: 210,
-        q: 0.0001,
-        cf: 30.55,
-      },
+      // {
+      //   i: 8916,
+      //   s: 'ICP',
+      //   p: 'USDT',
+      //   n: 'Internet Computer',
+      //   of: 210,
+      //   q: 0.0001,
+      //   cf: 30.55,
+      // },
     ],
     // originalFund:0,
     // quantityCoin:0,
@@ -171,14 +172,9 @@ export const slice = createSlice({
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
       if (action.payload) {
-        console.log(action.payload);
         let coin = { ...action.payload };
         state.entities.push(coin);
         state.btnAddIsLoading = false;
-        // return {
-        //   ...state,
-        //   btnAddIsLoading: false,
-        // };
       }
     },
 
@@ -211,15 +207,14 @@ export const slice = createSlice({
       );
       state.entities.splice(coinIndex, 1);
     },
-    // removeCoin: (state, { payload }) => ({
-    //   ...state,
-    //   entities: state.entities.splice(
-    //     state.entities.findIndex(
-    //       (entity) => entity.s === payload.symbol && entity.p === payload.pair
-    //     ),
-    //     1
-    //   ),
-    // }),
+    backupMarkets: (state) => ({
+      ...state,
+      prevMarkets: state.entities.reduce((markets, entity) => {
+        let pair = entity.s + entity.p;
+        markets[pair] = entity.price;
+        return markets;
+      }, {}),
+    }),
   },
 });
 
@@ -232,6 +227,7 @@ export const {
   showPrice,
   hidePercent,
   showPercent,
+  backupMarkets,
 } = slice.actions;
 
 // The function below is called a thunk and allows us to perform async logic. It

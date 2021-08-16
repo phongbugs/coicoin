@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -8,7 +8,7 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { entities, removeCoin } from '../redux/slice';
+import { removeCoin } from '../redux/slice';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
@@ -21,27 +21,29 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CoinList() {
-  const data = useSelector(entities);
+  //const data = useSelector(entities);
   const dispatch = useDispatch();
   const classes = useStyles(),
     srcCoinIconPrefix = 'https://s2.coinmarketcap.com/static/img/coins/64x64/',
     extensionCoinIcon = '.png',
     widthCoinIcon = '32px',
     heightCoinIcon = '32px';
-  let { isShowPrice, isShowPercent } = useSelector(
+  let { currentState } = useSelector(
     (state) => ({
-      isShowPrice: state.coin.isShowPrice,
-      isShowPercent: state.coin.isShowPercent,
+      currentState: state.coin,
     }),
     shallowEqual
   );
-  useEffect(() => {
-    console.log('CoinList.isShowPrice:%s', isShowPrice);
-  }, [isShowPrice]);
   let coinItems = [];
 
   let trendingIcon = (profix) =>
     profix > 0 ? (
+      <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    ) : (
+      <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    );
+  let trendingIconPrice = (price, prevPrice) =>
+    price >= prevPrice ? (
       <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
     ) : (
       <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
@@ -130,21 +132,33 @@ export default function CoinList() {
       </Typography>
     );
   };
-  const formatPrice = (price) => {
+  const formatPrice = (record) => {
+    let price = +record.price;
+    let market = record.s + record.p;
+    let prevPrice = isNaN(currentState.prevMarkets[market])
+      ? price
+      : +currentState.prevMarkets[market];
+    // console.log('prevPrice %s: %s', market, prevPrice);
+    // console.log('price %s : %s', market, price);
+    // console.log(currentState.prevMarkets);
+
     return (
       <Typography
         style={{
-          color: price < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
+          color: price >= prevPrice ? '#019A01' : '#cc1a1a',
           fontSize: '0.875rem',
         }}
       >
-        {trendingIcon(price)}
-        {' ' + price.toString().substring(0, 10)} $
+        {trendingIconPrice(price, prevPrice)}{' '}
+        {price < 1000
+          ? +price.toString().substring(0, 11)
+          : formatOriginalFund(price).replace('$', '')}{' '}
+        $
       </Typography>
     );
   };
   const formatProfixPercent = (profixPercent) => {
-    return isShowPercent ? (
+    return currentState.isShowPercent ? (
       <>
         (
         <i style={{ fontSize: '11px', fontWeight: 'bold' }}>
@@ -156,8 +170,8 @@ export default function CoinList() {
       ''
     );
   };
-  if (data.length > 0) {
-    coinItems = data.map((record, index) => {
+  if (currentState.entities.length > 0) {
+    coinItems = currentState.entities.map((record, index) => {
       let profix = record.cf - record.of,
         profixPercent = profix / record.of;
       return (
@@ -190,8 +204,8 @@ export default function CoinList() {
           <CoinListItemText
             style={{ width: '50%' }}
             primary={
-              isShowPrice
-                ? formatPrice(record.price)
+              currentState.isShowPrice
+                ? formatPrice(record)
                 : formatProfix(profix, profixPercent)
             }
             secondary={formatCurentFund(record)}

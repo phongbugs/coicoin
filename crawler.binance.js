@@ -6,11 +6,12 @@ const Binance = require('node-binance-api'),
     APIKEY: cfg.APIKEY,
     APISECRET: cfg.APISECRET,
   }),
+  env = process.env.NODE_ENV || 'development',
   fetchPriceFrom3rdParty = require('./crawler.cmc').fetchPriceFrom3rdParty;
 
-const TIMEOUT_SYNC_BNBMARKET = 60000,
-  TIMEOUT_SYNC_EXTRAMARKET = 300000,
-  TIMEOUT_START_INIT_SYMBOLS = 30000;
+const TIMEOUT_SYNC_BNBMARKET = cfg[env].TIMEOUT_SYNC_BNBMARKET,
+  TIMEOUT_SYNC_EXTRAMARKET = cfg[env].TIMEOUT_SYNC_EXTRAMARKET,
+  TIMEOUT_START_INIT_SYMBOLS = cfg[env].TIMEOUT_START_INIT_SYMBOLS;
 
 function getAllMarkets(callback) {
   return binance.prices((error, ticker) => {
@@ -25,47 +26,43 @@ function getAllMarkets(callback) {
 
 async function syncBNBMarkets() {
   try {
+    log('Syncing BNBMARTKETS...');
     getAllMarkets((markets) => {
       global.MARKETS = markets;
-      log(
-        '%s: waiting after %s',
-        new Date().toLocaleString(),
-        TIMEOUT_SYNC_BNBMARKET
-      );
-      log(markets.BTCUSDT);
+      // log(
+      //   '%s: waiting after %s',
+      //   new Date().toLocaleString(),
+      //   TIMEOUT_SYNC_BNBMARKET
+      // );
+      //log(markets.BTCUSDT);
+      log('==> Done Syncing BNBMARTKETS...');
       setTimeout(async () => await syncBNBMarkets(), TIMEOUT_SYNC_BNBMARKET);
     });
   } catch (error) {
     log(error);
-    log(
-      '%s: waiting after %s',
-      new Date().toLocaleString(),
-      TIMEOUT_SYNC_BNBMARKET
-    );
     setTimeout(async () => await syncBNBMarkets(), TIMEOUT_SYNC_BNBMARKET);
   }
 }
 
 async function syncPriceExtraMarkets() {
   if (global.EXTRAMARTKETS.length > 0) {
-    log('Extra Markets:, %s', global.EXTRAMARTKETS);
+    log('Syncing EXTRAMARTKETS: %s', global.EXTRAMARTKETS);
     await Promise.all(
       global.EXTRAMARTKETS.map(
         async (market) =>
           (global.MARKETS[market] = await fetchPriceFrom3rdParty(market))
       )
     ).then(() => {
-      log('done sync extra market');
+      log('==> Done Syncing EXTRAMARTKETS');
     });
   } else {
-    log('No Extra market');
+    log('EXTRAMARTKETS NODATA');
   }
   setTimeout(() => syncPriceExtraMarkets(), TIMEOUT_SYNC_EXTRAMARKET);
 }
 
 async function initStatistics() {
   global.EXTRAMARTKETS = [];
-  let env = process.env.NODE_ENV || 'development';
   setTimeout(async () => {
     let outerBinanceSymbols = (
       await (
