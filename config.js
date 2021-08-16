@@ -9,8 +9,8 @@ module.exports = {
   },
   production: {
     localApiUrl: 'https://coicoin.cc',
-    TIMEOUT_SYNC_BNBMARKET: 10000,
-    TIMEOUT_SYNC_EXTRAMARKET: 10000,
-    TIMEOUT_START_INIT_SYMBOLS: 30000,
+    TIMEOUT_SYNC_BNBMARKET: 60000,
+    TIMEOUT_SYNC_EXTRAMARKET: 300000,
+    TIMEOUT_START_INIT_SYMBOLS: 60000,
   },
 };
