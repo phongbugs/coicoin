@@ -30,6 +30,7 @@ app.use(function (req, res, next) {
     'http://localhost:3000',
     'http://192.168.2.185:3000',
     'http://localhost:5000',
+    'http://localhost:9999',
     'https://coicoin.cc',
   ];
   var origin = req.headers.origin;
