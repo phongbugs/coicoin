@@ -46,7 +46,7 @@ const log = console.log;
 const fetchPrice = async (market) => {
   let url = process.env.REACT_APP_API_URL;
   try {
-    const response = await fetch(url + 'info/price/' + market);
+    const response = await fetch(url + '/info/price/' + market);
     const price = (await response.json())['price'];
     return +price;
   } catch (error) {
@@ -60,7 +60,7 @@ const fetchPrices = async (markets) => {
   let url = process.env.REACT_APP_API_URL;
   try {
     const response = await fetch(
-      url + 'info/prices/' + [...new Set(markets)].toString()
+      url + '/info/prices/' + [...new Set(markets)].toString()
     );
     const prices = await response.json();
     return prices;
