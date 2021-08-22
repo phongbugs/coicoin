@@ -24,7 +24,6 @@ export default function CoinComboBox(props) {
       getOptionLabel={(option) => option.s}
       style={{ marginBottom: '10px', color: 'white' }}
       onChange={(e, v) => props.sendSymbol(v ? v.s : '')}
-      //inputValue={input}
       renderInput={(params) => (
         <CoinTextField
           {...params}
@@ -35,7 +34,6 @@ export default function CoinComboBox(props) {
           placeholder='Nhập mã coin'
           variant='outlined'
           onChange={(e) => props.sendSymbol(e.target.value.s)}
-          //value={input.s}
         />
       )}
       filterOptions={filterOptions}

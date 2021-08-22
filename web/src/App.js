@@ -6,6 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SyncIcon from '@material-ui/icons/Sync';
+import SaveIcon from '@material-ui/icons/Save';
+import BackupIcon from '@material-ui/icons/Backup';
 import Button from '@material-ui/core/Button';
 import CoinList from './components/CoinList';
 import PairComboBox from './components/PairComboBox';
@@ -113,8 +115,10 @@ function App() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [isAdding, setIsAdding] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [quantityCoin, setQuantityCoin] = useState('');
+  const [isSavingOffline, setIsSavingOffline] = useState(false);
+  const [isSavingOnline, setIsSavingOnline] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
   const [modeDCA, setModeDCA] = useState('');
@@ -138,7 +142,9 @@ function App() {
 
   useEffect(() => {
     async function updatePriceStartingApp() {
-      dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
+      let coinData =
+        JSON.parse(localStorage.getItem('coins')) || currentState.entities;
+      dispatch(updateCoins(await getCoinsWithNewPrices(coinData)));
     }
     setDefaultConfigs();
     updatePriceStartingApp();
@@ -229,6 +235,7 @@ function App() {
             }}
             value={quantityCoin}
             onChange={(e) => setQuantityCoin(e.target.value)}
+            onFocus={(e) => setQuantityCoin('')}
           />
         </Grid>
         <Grid item xs={4} sm={3} md={3} lg={2} xl={3}>
@@ -246,6 +253,7 @@ function App() {
             }}
             value={originalFund}
             onChange={(e) => setOriginalFund(e.target.value)}
+            onFocus={(e) => setOriginalFund('')}
           />
         </Grid>
         <Grid item xs={4} sm={12} md={12} lg={2} xl={3}>
@@ -339,6 +347,65 @@ function App() {
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <CoinList />
+        </Grid>
+        <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+          <Button
+            fullWidth
+            style={{
+              height: '39px',
+              background: '#2c732c',
+              color: 'rgb(222 222 222)',
+              fontWeight: 'bold',
+            }}
+            //className={classes.btnCoin}
+            variant='contained'
+            endIcon={
+              isSavingOffline ? (
+                <CircularProgress size={20} style={{ color: '#fff' }} />
+              ) : (
+                <SaveIcon />
+              )
+            }
+            onClick={async () => {
+              setIsSavingOffline(true);
+              setTimeout(() => {
+                localStorage.setItem(
+                  'coins',
+                  JSON.stringify(currentState.entities)
+                );
+                setIsSavingOffline(false);
+              }, 1000);
+            }}
+          >
+            Save offline
+          </Button>
+        </Grid>
+        <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+          <Button
+            fullWidth
+            style={{
+              height: '39px',
+              background: '#2c732c',
+              color: 'rgb(222 222 222)',
+              fontWeight: 'bold',
+            }}
+            //className={classes.btnCoin}
+            variant='contained'
+            endIcon={
+              isSavingOnline ? (
+                <CircularProgress size={20} style={{ color: '#fff' }} />
+              ) : (
+                <BackupIcon />
+              )
+            }
+            onClick={async () => {
+              setIsSavingOnline(true);
+              alert('login please');
+              setIsSavingOnline(false);
+            }}
+          >
+            Save online
+          </Button>
         </Grid>
       </Grid>
     </div>
