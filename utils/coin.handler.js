@@ -91,7 +91,7 @@ const log = console.log,
   //==> Map raw data to object json
   toJson({
     data: readCoins({
-      srcRawDataFile: './coin.data.raw.json',
+      srcRawDataFile: './coin.data.raw.6141.json',
       returnType: 'object',
     }),
     destFile: './coin.map.object.js',
@@ -102,7 +102,7 @@ const log = console.log,
 
   //==> Convert raw data to csv file
   convertJsonToCsv({
-    srcRawDataFile: './coin.data.raw.json',
+    srcRawDataFile: './coin.data.raw.6141.json',
     destJsonFile: './coin.map.js',
     destCsvFile: './coin.map.csv',
   });
