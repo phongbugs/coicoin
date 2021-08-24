@@ -110,6 +110,7 @@ function useInterval(callback, delay) {
     }
   }, [delay]);
 }
+let guid = () => new Date().getTime();
 
 function App() {
   const classes = useStyles();
@@ -195,8 +196,10 @@ function App() {
         let price = await fetchPrice(market);
         coin['cf'] = price * +quantityCoin;
         coin['price'] = price;
+        coin['index'] = guid();
       }
     }
+    log(coin);
     return coin;
   };
   return (
@@ -301,7 +304,7 @@ function App() {
             Thêm
           </Button>
         </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+        <Grid item xs={2} sm={2} md={2} lg={2} xl={2}>
           <Button
             fullWidth
             style={{
@@ -335,10 +338,10 @@ function App() {
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <Switcher label='DCA' mode='on' sendMode={sendModeDCA} />
         </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+        <Grid item xs={2} sm={3} md={3} lg={3} xl={3}>
           <Switcher label='%' mode='on' sendMode={sendModePercent} />
         </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+        <Grid item xs={2} sm={3} md={3} lg={3} xl={3}>
           <Switcher
             label='Giá'
             mode={currentState.isShowPrice ? 'on' : 'off'}
@@ -359,7 +362,7 @@ function App() {
             }}
             //className={classes.btnCoin}
             variant='contained'
-            endIcon={
+            startIcon={
               isSavingOffline ? (
                 <CircularProgress size={20} style={{ color: '#fff' }} />
               ) : (
@@ -367,14 +370,21 @@ function App() {
               )
             }
             onClick={async () => {
-              setIsSavingOffline(true);
-              setTimeout(() => {
-                localStorage.setItem(
-                  'coins',
-                  JSON.stringify(currentState.entities)
-                );
-                setIsSavingOffline(false);
-              }, 1000);
+              var r = window.confirm(
+                'Dữ liệu chỉ lưu trên mỗi thiết bị/trình duyệt, sẽ mất khi xóa lịch sử duyệt web'
+              );
+              if (r === true) {
+                setIsSavingOffline(true);
+                setTimeout(() => {
+                  localStorage.setItem(
+                    'coins',
+                    JSON.stringify(currentState.entities)
+                  );
+                  setIsSavingOffline(false);
+                }, 500);
+              } else {
+                log('Cancel save offline feature');
+              }
             }}
           >
             Save offline
@@ -391,7 +401,7 @@ function App() {
             }}
             //className={classes.btnCoin}
             variant='contained'
-            endIcon={
+            startIcon={
               isSavingOnline ? (
                 <CircularProgress size={20} style={{ color: '#fff' }} />
               ) : (

@@ -75,9 +75,7 @@ export default function CoinList() {
         {fund}
         <DeleteIcon
           style={{ float: 'right', color: '#ab2828', cursor: 'pointer' }}
-          onClick={() =>
-            dispatch(removeCoin({ symbol: record.s, pair: record.p }))
-          }
+          onClick={() => dispatch(removeCoin({ index: record.index }))}
         />
       </>
     );
@@ -179,7 +177,7 @@ export default function CoinList() {
     ) : (
       <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
     );
-    
+
   const CoinListItemText = withStyles({
     root: {
       textAlign: 'left',

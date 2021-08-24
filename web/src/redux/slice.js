@@ -21,7 +21,6 @@ export const slice = createSlice({
       // },
       // // {
       // //   i: 1027,
-
       // //   s: 'ETH',
       // //   p: 'USDT',
       // //   n: 'Etherum',
@@ -75,7 +74,6 @@ export const slice = createSlice({
       //   r: 27,
       //   s: 'EOS',
       // },
-
       // {
       //   i: 2010,
       //   s: 'ADA',
@@ -113,7 +111,6 @@ export const slice = createSlice({
       // //   q: 708.754296,
       // //   cf: 908,
       // // },
-
       // {
       //   i: 9119,
       //   s: 'TLM',
@@ -201,9 +198,9 @@ export const slice = createSlice({
       isShowPercent: false,
     }),
     removeCoin: (state, action) => {
-      let { symbol, pair } = action.payload;
+      let { index } = action.payload;
       let coinIndex = state.entities.findIndex(
-        (entity) => entity.s === symbol && entity.p === pair
+        (entity) => entity.index === index
       );
       state.entities.splice(coinIndex, 1);
     },
