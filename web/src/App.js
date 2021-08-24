@@ -143,8 +143,12 @@ function App() {
 
   useEffect(() => {
     async function updatePriceStartingApp() {
+      let dataOffline = JSON.parse(localStorage.getItem('coins'));
+      let dataInit = currentState.entities;
       let coinData =
-        JSON.parse(localStorage.getItem('coins')) || currentState.entities;
+        !dataOffline || (dataOffline && dataOffline.length === 0)
+          ? dataInit
+          : dataOffline;
       dispatch(updateCoins(await getCoinsWithNewPrices(coinData)));
     }
     setDefaultConfigs();
