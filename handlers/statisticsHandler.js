@@ -11,6 +11,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
   fetchBinanceSymbolCoins = (callback) => {
     try {
       getAllMarkets((markets) => {
+        //log(markets)
         var listBinanceSymbols = [];
         for (market in markets) {
           let usdt = market.substr(market.length - 4, 4);
@@ -19,6 +20,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
             listBinanceSymbols.push(coinSymbol);
           }
         }
+        //log(listBinanceSymbols)
         callback(listBinanceSymbols);
       });
     } catch (error) {
@@ -27,20 +29,29 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
   },
   fetchCoinmarketcapSymbolCoins = async () => {
     try {
-      const response = await fetch(
-        'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?' +
-          new URLSearchParams({
-            start: 1,
-            limit: 5952,
-            sortBy: 'market_cap',
-            sortType: 'desc',
-            convert: 'USD,BTC,ETH',
-          })
-      );
-      const symbols = (await response.json()).data.cryptoCurrencyList.map(
+      // const response = await fetch(
+        
+      //   'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?' +
+      //     new URLSearchParams({
+      //       start: 1,
+      //       limit: 6141,
+      //       sortBy: 'market_cap',
+      //       sortType: 'desc',
+      //       convert: 'USD,BTC,ETH',
+      //     })
+      // );
+      // const symbols = (await response.json()).data.cryptoCurrencyList.map(
+      //   (coin) => coin.symbol
+      // );
+
+      // const data = require('../cmc.raw.js')
+      // log(data)
+      const symbols = require('../cmc.raw.js').data.cryptoCurrencyList.map(
         (coin) => coin.symbol
       );
+      //log(symbols)
       return symbols;
+      
     } catch (error) {
       log(error);
     }
@@ -49,10 +60,12 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
     try {
       fetchBinanceSymbolCoins(async (binanceSymbols) => {
         let cmcSymbols = await fetchCoinmarketcapSymbolCoins();
+        //log(cmcSymbols)
         //https://medium.com/@alvaro.saburido/set-theory-for-arrays-in-es6-eb2f20a61848
         let outerBinanceSymbols = cmcSymbols.filter(
           (x) => !binanceSymbols.includes(x)
         );
+        //log(outerBinanceSymbols)
         callback(outerBinanceSymbols);
       });
     } catch (error) {
@@ -62,6 +75,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
   getInfoBinance = async (_, res) => {
     try {
       fetchBinanceSymbolCoins((symbols) => {
+        //log(symbols)
         res.send({ quantity: symbols.length, symbols: symbols });
       });
     } catch (error) {
@@ -70,6 +84,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
   },
   getInfoCoinmarketcap = async (_, res) => {
     let symbols = await fetchCoinmarketcapSymbolCoins();
+    //log(symbols)
     res.send({ quantity: symbols.length, symbols: symbols });
   },
   getInfoOuterBinance = (_, res) => {
