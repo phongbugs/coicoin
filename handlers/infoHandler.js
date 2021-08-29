@@ -41,9 +41,29 @@ function fetchAllPrices(_, res) {
     res.send(error);
   }
 }
+function fetchBNBMarkets(_, res) {
+  try {
+    res.send(global.BNBSYMBOLS);
+  } catch (error) {
+    log(error);
+    res.send(error);
+  }
+}
+
+function fetchBNBOuterMarkets(_, res) {
+  try {
+    res.send(global.EXTRAMARTKETS);
+  } catch (error) {
+    log(error);
+    res.send(error);
+  }
+}
+
 
 module.exports = {
   fetchPrice,
   fetchPrices,
   fetchAllPrices,
+  fetchBNBMarkets,
+  fetchBNBOuterMarkets
 };
