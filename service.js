@@ -11,43 +11,39 @@ const cfg = require('./config'),
 
 async function syncBNBMarkets() {
   try {
-    //log('Syncing BNBMARTKETS...');
-    binanceCrawler.getAllMarkets((markets) => {
-      global.MARKETS = markets;
-      // log(
-      //   '%s: waiting after %s',
-      //   new Date().toLocaleString(),
-      //   TIMEOUT_SYNC_BNBMARKET
-      // );
-      //log(markets.BTCUSDT);
-      log('==> Done Syncing BNBMARTKETS...');
-      setTimeout(async () => await syncBNBMarkets(), TIMEOUT_SYNC_BNBMARKET);
-    });
+    setInterval(async () => {
+      //log('Syncing BNBMARTKETS...');
+      binanceCrawler.getAllMarkets((markets) => {
+        global.MARKETS = markets;
+        log('==> Done Syncing BNBMARTKETS...');
+      });
+    }, TIMEOUT_SYNC_BNBMARKET);
   } catch (error) {
     log('==> syncBNBMarkets error:');
     log(error);
-    //setTimeout(async () => await syncBNBMarkets(), TIMEOUT_SYNC_BNBMARKET);
   }
 }
 
 async function syncExtraMarkets() {
   try {
-    if (global.EXTRAMARTKETS.length > 0) {
-      log('Syncing EXTRAMARTKETS: %s', global.EXTRAMARTKETS);
-      await Promise.all(
-        global.EXTRAMARTKETS.map(
-          async (market) =>
-            (global.MARKETS[market] = await cmcCrawler.fetchPriceFrom3rdParty(
-              market
-            ))
-        )
-      ).then(() => {
-        log('==> Done Syncing EXTRAMARTKETS');
-      });
-    } else {
-      log('EXTRAMARTKETS NODATA');
-    }
-    setTimeout(() => syncExtraMarkets(), TIMEOUT_SYNC_EXTRAMARKET);
+    setInterval(async () => {
+      if (global.EXTRAMARTKETS.length > 0) {
+        log('Syncing EXTRAMARTKETS: %s', global.EXTRAMARTKETS);
+        await Promise.all(
+          global.EXTRAMARTKETS.map(
+            async (market) =>
+              (global.MARKETS[market] = await cmcCrawler.fetchPriceFrom3rdParty(
+                market
+              ))
+          )
+        ).then(() => {
+          log('==> Done Syncing EXTRAMARTKETS');
+        });
+      } else {
+        log('EXTRAMARTKETS NODATA');
+      }
+    }, TIMEOUT_SYNC_EXTRAMARKET);
+    //setTimeout(() => syncExtraMarkets(), TIMEOUT_SYNC_EXTRAMARKET);
   } catch (error) {
     log('==> syncExtraMarkets error:');
     log(error);
