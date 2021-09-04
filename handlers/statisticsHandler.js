@@ -30,7 +30,6 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
   fetchCoinmarketcapSymbolCoins = async () => {
     try {
       // const response = await fetch(
-        
       //   'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?' +
       //     new URLSearchParams({
       //       start: 1,
@@ -96,6 +95,6 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
 module.exports = {
   getInfoBinance,
   getInfoCoinmarketcap,
-  getInfoOuterBinance,
+  getInfoOuterBinance, 
   fetchOuterBinanceSymbols,
 };

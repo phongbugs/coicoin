@@ -74,6 +74,21 @@ const log = console.log,
         toCsv({ srcFile: destJsonFile, destFile: destCsvFile });
       }
     );
+  },
+  /**
+   * return {"USDT": "Tether", "BNB":"Binance-coin"}
+   */
+  mapToSymbolKeyName = (srcRawDataFile) => {
+    let rawdata = fs.readFileSync(srcRawDataFile);
+    let data = JSON.parse(rawdata).data;
+    let coins = {};
+    for (cryptoCurrency of data.cryptoCurrencyList)
+      coins[cryptoCurrency.symbol] = cryptoCurrency.name
+        .replace(/[ .]/g, '-')
+        .toLowerCase();
+    console.log(coins);
+    toJson({ data: coins, destFile: './coin.map.name.json' });
+    return coins;
   };
 
 (() => {
@@ -101,10 +116,10 @@ const log = console.log,
   // toCsv({ srcFile: 'coin.map.js', destFile: 'coin.map.csv' });
 
   //==> Convert raw data to csv file
-  convertJsonToCsv({
-    srcRawDataFile: './coin.data.raw.6141.json',
-    destJsonFile: './coin.map.js',
-    destCsvFile: './coin.map.csv',
-  });
-
+  // convertJsonToCsv({
+  //   srcRawDataFile: './coin.data.raw.6141.json',
+  //   destJsonFile: './coin.map.js',
+  //   destCsvFile: './coin.map.csv',
+  // });
+  mapToSymbolKeyName('./coin.data.raw.6344.json');
 })();
