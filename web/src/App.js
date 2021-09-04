@@ -6,6 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SyncIcon from '@material-ui/icons/Sync';
+import SaveIcon from '@material-ui/icons/Save';
+import BackupIcon from '@material-ui/icons/Backup';
 import Button from '@material-ui/core/Button';
 import CoinList from './components/CoinList';
 import PairComboBox from './components/PairComboBox';
@@ -46,7 +48,7 @@ const log = console.log;
 const fetchPrice = async (market) => {
   let url = process.env.REACT_APP_API_URL;
   try {
-    const response = await fetch(url + 'info/price/' + market);
+    const response = await fetch(url + '/info/price/' + market);
     const price = (await response.json())['price'];
     return +price;
   } catch (error) {
@@ -60,7 +62,7 @@ const fetchPrices = async (markets) => {
   let url = process.env.REACT_APP_API_URL;
   try {
     const response = await fetch(
-      url + 'info/prices/' + [...new Set(markets)].toString()
+      url + '/info/prices/' + [...new Set(markets)].toString()
     );
     const prices = await response.json();
     return prices;
@@ -108,13 +110,16 @@ function useInterval(callback, delay) {
     }
   }, [delay]);
 }
+let guid = () => new Date().getTime();
 
 function App() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [isAdding, setIsAdding] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [quantityCoin, setQuantityCoin] = useState('');
+  const [isSavingOffline, setIsSavingOffline] = useState(false);
+  const [isSavingOnline, setIsSavingOnline] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
   const [modeDCA, setModeDCA] = useState('');
@@ -138,7 +143,13 @@ function App() {
 
   useEffect(() => {
     async function updatePriceStartingApp() {
-      dispatch(updateCoins(await getCoinsWithNewPrices(currentState.entities)));
+      let dataOffline = JSON.parse(localStorage.getItem('coins'));
+      let dataInit = currentState.entities;
+      let coinData =
+        !dataOffline || (dataOffline && dataOffline.length === 0)
+          ? dataInit
+          : dataOffline;
+      dispatch(updateCoins(await getCoinsWithNewPrices(coinData)));
     }
     setDefaultConfigs();
     updatePriceStartingApp();
@@ -189,8 +200,10 @@ function App() {
         let price = await fetchPrice(market);
         coin['cf'] = price * +quantityCoin;
         coin['price'] = price;
+        coin['index'] = guid();
       }
     }
+    log(coin);
     return coin;
   };
   return (
@@ -229,6 +242,7 @@ function App() {
             }}
             value={quantityCoin}
             onChange={(e) => setQuantityCoin(e.target.value)}
+            onFocus={(e) => setQuantityCoin('')}
           />
         </Grid>
         <Grid item xs={4} sm={3} md={3} lg={2} xl={3}>
@@ -246,6 +260,7 @@ function App() {
             }}
             value={originalFund}
             onChange={(e) => setOriginalFund(e.target.value)}
+            onFocus={(e) => setOriginalFund('')}
           />
         </Grid>
         <Grid item xs={4} sm={12} md={12} lg={2} xl={3}>
@@ -293,7 +308,7 @@ function App() {
             Thêm
           </Button>
         </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+        <Grid item xs={2} sm={2} md={2} lg={2} xl={2}>
           <Button
             fullWidth
             style={{
@@ -327,10 +342,10 @@ function App() {
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
           <Switcher label='DCA' mode='on' sendMode={sendModeDCA} />
         </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+        <Grid item xs={2} sm={3} md={3} lg={3} xl={3}>
           <Switcher label='%' mode='on' sendMode={sendModePercent} />
         </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
+        <Grid item xs={2} sm={3} md={3} lg={3} xl={3}>
           <Switcher
             label='Giá'
             mode={currentState.isShowPrice ? 'on' : 'off'}
@@ -339,6 +354,72 @@ function App() {
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <CoinList />
+        </Grid>
+        <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+          <Button
+            fullWidth
+            style={{
+              height: '39px',
+              background: '#2c732c',
+              color: 'rgb(222 222 222)',
+              fontWeight: 'bold',
+            }}
+            //className={classes.btnCoin}
+            variant='contained'
+            startIcon={
+              isSavingOffline ? (
+                <CircularProgress size={20} style={{ color: '#fff' }} />
+              ) : (
+                <SaveIcon />
+              )
+            }
+            onClick={async () => {
+              var r = window.confirm(
+                'Dữ liệu chỉ lưu trên mỗi thiết bị/trình duyệt, sẽ mất khi xóa lịch sử duyệt web'
+              );
+              if (r === true) {
+                setIsSavingOffline(true);
+                setTimeout(() => {
+                  localStorage.setItem(
+                    'coins',
+                    JSON.stringify(currentState.entities)
+                  );
+                  setIsSavingOffline(false);
+                }, 500);
+              } else {
+                log('Cancel save offline feature');
+              }
+            }}
+          >
+            Save offline
+          </Button>
+        </Grid>
+        <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+          <Button
+            fullWidth
+            style={{
+              height: '39px',
+              background: '#2c732c',
+              color: 'rgb(222 222 222)',
+              fontWeight: 'bold',
+            }}
+            //className={classes.btnCoin}
+            variant='contained'
+            startIcon={
+              isSavingOnline ? (
+                <CircularProgress size={20} style={{ color: '#fff' }} />
+              ) : (
+                <BackupIcon />
+              )
+            }
+            onClick={async () => {
+              setIsSavingOnline(true);
+              alert('login please');
+              setIsSavingOnline(false);
+            }}
+          >
+            Save online
+          </Button>
         </Grid>
       </Grid>
     </div>

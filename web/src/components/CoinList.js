@@ -12,6 +12,7 @@ import { removeCoin } from '../redux/slice';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import coinSummaryLogo from '../img/coinsummary.png';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -34,27 +35,10 @@ export default function CoinList() {
     }),
     shallowEqual
   );
-  let coinItems = [];
 
-  let trendingIcon = (profix) =>
-    profix > 0 ? (
-      <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
-    ) : (
-      <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
-    );
-  let trendingIconPrice = (price, prevPrice) =>
-    price >= prevPrice ? (
-      <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
-    ) : (
-      <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
-    );
-  const CoinListItemText = withStyles({
-    root: {
-      textAlign: 'left',
-      backgroundColor: 'transparent',
-    },
-  })(ListItemText);
-
+  /**
+   * Format function group
+   */
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -62,6 +46,14 @@ export default function CoinList() {
   });
 
   const formatOriginalFund = (fund) => {
+    if (fund % 1 === 0)
+      return (
+        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
+        ' $'
+      );
+    return formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
+  };
+  const formatFund = (fund) => {
     if (fund % 1 === 0)
       return (
         formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
@@ -83,9 +75,7 @@ export default function CoinList() {
         {fund}
         <DeleteIcon
           style={{ float: 'right', color: '#ab2828', cursor: 'pointer' }}
-          onClick={() =>
-            dispatch(removeCoin({ symbol: record.s, pair: record.p }))
-          }
+          onClick={() => dispatch(removeCoin({ index: record.index }))}
         />
       </>
     );
@@ -170,6 +160,83 @@ export default function CoinList() {
       ''
     );
   };
+
+  /**
+   * Components Util group
+   */
+
+  let trendingIcon = (profix) =>
+    profix > 0 ? (
+      <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    ) : (
+      <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    );
+  let trendingIconPrice = (price, prevPrice) =>
+    price >= prevPrice ? (
+      <TrendingUpIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    ) : (
+      <TrendingDownIcon fontSize='small' style={{ verticalAlign: 'bottom' }} />
+    );
+
+  const CoinListItemText = withStyles({
+    root: {
+      textAlign: 'left',
+      backgroundColor: 'transparent',
+    },
+  })(ListItemText);
+
+  let totalCurrentFund = 0,
+    totalOriginalFund = 0,
+    totalProfix = 0,
+    totalProfixPercent = 0;
+  currentState.entities.forEach((entity) => {
+    totalCurrentFund += +entity.cf;
+    totalOriginalFund += +entity.of;
+  });
+
+  totalProfix = totalCurrentFund - totalOriginalFund;
+  totalProfixPercent = totalProfix / totalOriginalFund;
+  let coinSummary = (
+    <ListItem
+      style={{
+        marginBottom: '5px',
+        backgroundColor: 'rgb(193 193 174)',
+        borderBottom: '2px dotted rgb(25 27 32)',
+      }}
+    >
+      <ListItemAvatar style={{ width: '32px' }}>
+        <Avatar>
+          <IconButton color='primary'>
+            <img
+              alt=''
+              width={widthCoinIcon}
+              height={heightCoinIcon}
+              src={coinSummaryLogo}
+            />{' '}
+          </IconButton>
+        </Avatar>
+      </ListItemAvatar>
+      <CoinListItemText
+        style={{ width: '25%' }}
+        primary={'Tổng vốn:'}
+        secondary={'Tổng ví:'}
+      />
+      {/* Total Original Fund & Total Current Fund */}
+      <CoinListItemText
+        style={{ width: '30%' }}
+        primary={formatFund(totalOriginalFund)}
+        secondary={formatFund(totalCurrentFund)}
+      />
+      {/* Total Profix & Total Profix Percent} */}
+      <CoinListItemText
+        style={{ width: '50%' }}
+        primary={'Lãi cuối:'}
+        secondary={formatProfix(totalProfix, totalProfixPercent)}
+      />
+    </ListItem>
+  );
+
+  let coinItems = [];
   if (currentState.entities.length > 0) {
     coinItems = currentState.entities.map((record, index) => {
       let profix = record.cf - record.of,
@@ -227,5 +294,12 @@ export default function CoinList() {
       );
     });
   }
-  return <List className={classes.root}>{coinItems}</List>;
+  return (
+    <>
+      <List className={classes.root}>
+        {currentState.entities.length > 0 ? coinSummary : ''}
+        {coinItems}
+      </List>
+    </>
+  );
 }

@@ -92,10 +92,10 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-let binanceCrawler = require('./crawler.binance');
-binanceCrawler.initStatistics();
-binanceCrawler.syncBNBMarkets();
-binanceCrawler.syncPriceExtraMarkets();
+let service = require('./service');
+service.initStatistics();
+service.syncBNBMarkets();
+service.syncExtraMarkets();
 
 //Whenever someone connects this gets executed
 io.on('connection', function (socket) {

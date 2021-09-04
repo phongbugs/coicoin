@@ -21,11 +21,11 @@
       "description": "Development server"
     },
     {
-      "url": "https://border-px1-api.herokuapp.com",
+      "url": "https://coicoincc.herokuapp.com",
       "description": "Test server"
     },
     {
-      "url": "https://border-px1-api.xyz",
+      "url": "https://coicoin.cc",
       "description": "Production server"
     }
   ],

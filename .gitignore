@@ -1,6 +1,5 @@
-
 node_modules/
 
-config.js
+web/src/redux/slice copy.js
 
 web/src/redux/slice copy.js
