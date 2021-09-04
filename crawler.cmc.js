@@ -1,5 +1,6 @@
 const log = console.log,
-  fetch = require('node-fetch');
+  fetch = require('node-fetch'),
+  coins = require('./coin.map.key.symbol.value.name')
 // ==> https://http-api.livecoinwatch.com
 // async function fetchPriceFrom3rdParty(market) {
 //   try {
@@ -76,13 +77,15 @@ const log = console.log,
 //
 // ==> https://api.coinmarketcap.com
 async function fetchPriceFrom3rdParty(market) {
+  let symbol = market.substring(0, market.length - 4);
+  let name = coins[symbol]
   try {
     let url =
       'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/market-pairs/latest?' +
       new URLSearchParams({
         start: 1,
         limit: 20,
-        slug: market.substring(0, market.length - 4),
+        slug: name,
       });
     log(url);
     const response = await fetch(url);
