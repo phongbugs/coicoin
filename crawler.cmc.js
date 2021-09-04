@@ -99,6 +99,6 @@ async function fetchPriceFrom3rdParty(market) {
   }
 }
 module.exports = { fetchPriceFrom3rdParty };
-(async () => {
-  fetchPriceFrom3rdParty('SAFEMOONUSDT');
-})();
+// (async () => {
+//   fetchPriceFrom3rdParty('SAFEMOONUSDT');
+// })();
