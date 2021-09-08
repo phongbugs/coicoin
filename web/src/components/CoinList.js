@@ -91,8 +91,11 @@ export default function CoinList() {
   };
 
   const formatSymbolCoin = (symbol) => {
-    if (symbol.length > 5) symbol = symbol.substring(0, 5) + '...';
-    return symbol;
+    if (symbol) {
+      console.log(symbol);
+      if (symbol.length > 5) symbol = symbol.substring(0, 5) + '...';
+      return symbol;
+    }
   };
   const formatNameCoin = (name) => {
     switch (name) {
@@ -196,45 +199,48 @@ export default function CoinList() {
 
   totalProfix = totalCurrentFund - totalOriginalFund;
   totalProfixPercent = totalProfix / totalOriginalFund;
-  let coinSummary = (
-    <ListItem
-      style={{
-        marginBottom: '5px',
-        backgroundColor: 'rgb(193 193 174)',
-        borderBottom: '2px dotted rgb(25 27 32)',
-      }}
-    >
-      <ListItemAvatar style={{ width: '32px' }}>
-        <Avatar>
-          <IconButton color='primary'>
-            <img
-              alt=''
-              width={widthCoinIcon}
-              height={heightCoinIcon}
-              src={coinSummaryLogo}
-            />{' '}
-          </IconButton>
-        </Avatar>
-      </ListItemAvatar>
-      <CoinListItemText
-        style={{ width: '25%' }}
-        primary={'Tổng vốn:'}
-        secondary={'Tổng ví:'}
-      />
-      {/* Total Original Fund & Total Current Fund */}
-      <CoinListItemText
-        style={{ width: '30%' }}
-        primary={formatFund(totalOriginalFund)}
-        secondary={formatFund(totalCurrentFund)}
-      />
-      {/* Total Profix & Total Profix Percent} */}
-      <CoinListItemText
-        style={{ width: '50%' }}
-        primary={'Lãi cuối:'}
-        secondary={formatProfix(totalProfix, totalProfixPercent)}
-      />
-    </ListItem>
-  );
+  let coinSummary = '';
+  if (currentState.entities.length > 0) {
+    coinSummary = (
+      <ListItem
+        style={{
+          marginBottom: '5px',
+          backgroundColor: 'rgb(193 193 174)',
+          borderBottom: '2px dotted rgb(25 27 32)',
+        }}
+      >
+        <ListItemAvatar style={{ width: '32px' }}>
+          <Avatar>
+            <IconButton color='primary'>
+              <img
+                alt=''
+                width={widthCoinIcon}
+                height={heightCoinIcon}
+                src={coinSummaryLogo}
+              />{' '}
+            </IconButton>
+          </Avatar>
+        </ListItemAvatar>
+        <CoinListItemText
+          style={{ width: '25%' }}
+          primary={'Tổng vốn:'}
+          secondary={'Tổng ví:'}
+        />
+        {/* Total Original Fund & Total Current Fund */}
+        <CoinListItemText
+          style={{ width: '30%' }}
+          primary={formatFund(totalOriginalFund)}
+          secondary={formatFund(totalCurrentFund)}
+        />
+        {/* Total Profix & Total Profix Percent} */}
+        <CoinListItemText
+          style={{ width: '50%' }}
+          primary={'Lãi cuối:'}
+          secondary={formatProfix(totalProfix, totalProfixPercent)}
+        />
+      </ListItem>
+    );
+  }
 
   let coinItems = [];
   if (currentState.entities.length > 0) {
@@ -297,7 +303,7 @@ export default function CoinList() {
   return (
     <>
       <List className={classes.root}>
-        {currentState.entities.length > 0 ? coinSummary : ''}
+        {coinSummary}
         {coinItems}
       </List>
     </>
