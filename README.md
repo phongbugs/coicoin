@@ -4,13 +4,17 @@
 
 ***All notable changes to this project will be documented in this part.***
 
+## [0.0.2r9]
 
-## [0.0.2]
+### Added
 
+### Fixed
+
+### Change
 
 ## [0.0.1]
 
-First release:
+**First release:**
 
 - Wallet App
   - Wallet Screen
