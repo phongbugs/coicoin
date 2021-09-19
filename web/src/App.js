@@ -68,7 +68,6 @@ const fetchPrices = async (markets) => {
     return prices;
   } catch (error) {
     log(error);
-    //alert(error.message);
   }
 };
 
@@ -176,12 +175,12 @@ function App() {
     else dispatch(hidePercent());
   };
   const isValidForm = () => {
-    if (originalFund === '' || quantityCoin === '' || symbolCoin === '') {
-      alert('Thiếu dữ liệu');
+    if (originalFund === '' || quantityCoin === '' || symbolCoin === '' || !symbolCoin) {
+      alert('Dữ liệu không hợp lệ');
       return false;
     }
     if (+originalFund === 0 || +quantityCoin === 0) {
-      alert('Số không hợp lệ');
+      alert('Dữ liệu không hợp lệ');
       return false;
     }
     return true;
@@ -257,6 +256,8 @@ function App() {
             variant='outlined'
             InputProps={{
               className: classes.input,
+              // inputMode: 'decimal',
+              // pattern:'\d*'
             }}
             value={originalFund}
             onChange={(e) => setOriginalFund(e.target.value)}
@@ -364,7 +365,6 @@ function App() {
               color: 'rgb(222 222 222)',
               fontWeight: 'bold',
             }}
-            //className={classes.btnCoin}
             variant='contained'
             startIcon={
               isSavingOffline ? (
@@ -403,7 +403,6 @@ function App() {
               color: 'rgb(222 222 222)',
               fontWeight: 'bold',
             }}
-            //className={classes.btnCoin}
             variant='contained'
             startIcon={
               isSavingOnline ? (
