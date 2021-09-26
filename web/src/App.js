@@ -5,17 +5,16 @@ import CoinTextField from './components/CoinTextField';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import SyncIcon from '@material-ui/icons/Sync';
-import SaveIcon from '@material-ui/icons/Save';
-import BackupIcon from '@material-ui/icons/Backup';
+import SaveIcon from '@material-ui/icons/Backup';
 import Button from '@material-ui/core/Button';
 import CoinList from './components/CoinList';
-import PairComboBox from './components/PairComboBox';
 import { makeStyles } from '@material-ui/core/styles';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import {
   addCoin,
   updateCoins,
+  enableDCAMode,
+  disableDCAMode,
   hidePrice,
   showPrice,
   hidePercent,
@@ -25,7 +24,6 @@ import {
 import { Coins } from './data/coin.map';
 import fetch from 'node-fetch';
 import Switcher from './components/Switcher';
-import CountDown from './components/CountDown';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -59,15 +57,17 @@ const fetchPrice = async (market) => {
 };
 
 const fetchPrices = async (markets) => {
-  let url = process.env.REACT_APP_API_URL;
-  try {
-    const response = await fetch(
-      url + '/info/prices/' + [...new Set(markets)].toString()
-    );
-    const prices = await response.json();
-    return prices;
-  } catch (error) {
-    log(error);
+  if (markets.length > 0) {
+    let url = process.env.REACT_APP_API_URL;
+    try {
+      const response = await fetch(
+        url + '/info/prices/' + [...new Set(markets)].toString()
+      );
+      const prices = await response.json();
+      return prices;
+    } catch (error) {
+      log(error);
+    }
   }
 };
 
@@ -117,15 +117,10 @@ function App() {
   const [isAdding, setIsAdding] = useState(false);
   const [quantityCoin, setQuantityCoin] = useState('');
   const [isSavingOffline, setIsSavingOffline] = useState(false);
-  const [isSavingOnline, setIsSavingOnline] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [originalFund, setOriginalFund] = useState('');
   const [symbolCoin, setSymbolCoin] = useState('');
   const [modeDCA, setModeDCA] = useState('');
-  const [symbolCoinPair, setSymbolCoinPair] = useState('USDT');
-  const [countRefresh, setCountRefresh] = useState(
-    process.env.REACT_APP_SYNC_PRICE_TIMEOUT / 1000
-  );
+  const [symbolCoinPair] = useState('USDT');
   let { currentState } = useSelector(
     (state) => ({ currentState: state.coin }),
     shallowEqual
@@ -160,11 +155,9 @@ function App() {
   const sendSymbol = (symbol) => {
     setSymbolCoin(symbol);
   };
-  const sendSymbolPair = (symbol) => {
-    setSymbolCoinPair(symbol);
-  };
   const sendModeDCA = (mode) => {
-    setModeDCA(mode);
+    if (mode === 'on') dispatch(enableDCAMode());
+    else dispatch(disableDCAMode());
   };
   const sendModePrice = (mode) => {
     if (mode === 'on') dispatch(showPrice());
@@ -175,7 +168,12 @@ function App() {
     else dispatch(hidePercent());
   };
   const isValidForm = () => {
-    if (originalFund === '' || quantityCoin === '' || symbolCoin === '' || !symbolCoin) {
+    if (
+      originalFund === '' ||
+      quantityCoin === '' ||
+      symbolCoin === '' ||
+      !symbolCoin
+    ) {
       alert('Dữ liệu không hợp lệ');
       return false;
     }
@@ -205,25 +203,80 @@ function App() {
     log(coin);
     return coin;
   };
+  const SaveButton = () => {
+    if (currentState.entities.length > 0)
+      return (
+        <Button
+          fullWidth
+          style={{
+            height: '39px',
+            background: '#2c732c',
+            color: 'rgb(222 222 222)',
+            fontWeight: 'bold',
+          }}
+          variant='contained'
+          startIcon={
+            isSavingOffline ? (
+              <CircularProgress size={20} style={{ color: '#fff' }} />
+            ) : (
+              <SaveIcon />
+            )
+          }
+          onClick={async () => {
+            var r = window.confirm(
+              'Dữ liệu chỉ lưu trên mỗi thiết bị/trình duyệt, sẽ mất khi xóa lịch sử duyệt web'
+            );
+            if (r === true) {
+              setIsSavingOffline(true);
+              setTimeout(() => {
+                localStorage.setItem(
+                  'coins',
+                  JSON.stringify(currentState.entities)
+                );
+                setIsSavingOffline(false);
+              }, 500);
+            } else {
+              log('Cancel save offline feature');
+            }
+          }}
+        >
+          Save
+        </Button>
+      );
+    return <></>;
+  };
+  const CoinListWidget = () => {
+    const col = 3;
+    if (currentState.entities.length > 0)
+      return (
+        <Grid container spacing={1}>
+          <Grid item xs={col} sm={col} md={col} lg={col} xl={col}>
+            <Switcher label='DCA' mode={currentState.isDCAMode ? 'on' : 'off'} sendMode={sendModeDCA} />
+          </Grid>
+          <Grid item xs={col} sm={col} md={col} lg={col} xl={col}>
+            <Switcher label='%' mode={currentState.isShowPercent? 'on' : 'off'} sendMode={sendModePercent} />
+          </Grid>
+          <Grid item xs={col} sm={col} md={col} lg={col} xl={col}>
+            <Switcher
+              label='Giá'
+              mode={currentState.isShowPrice ? 'on' : 'off'}
+              sendMode={sendModePrice}
+            />
+          </Grid>
+        </Grid>
+      );
+      return <></>
+  };
   return (
     <div className={classes.root}>
       <Grid container spacing={1}>
-        <Grid item xs={6} sm={3} md={3} lg={2} xl={3}>
+        <Grid item xs={12} sm={4} md={4} lg={2} xl={4}>
           <CoinComboBox
             InputProps={{
               className: classes.input,
             }}
             value={symbolCoin}
             sendSymbol={sendSymbol}
-          />
-        </Grid>
-        <Grid item xs={6} sm={3} md={3} lg={2} xl={3}>
-          <PairComboBox
-            InputProps={{
-              className: classes.input,
-            }}
-            value={symbolCoinPair}
-            sendSymbolPair={sendSymbolPair}
           />
         </Grid>
         <Grid item xs={4} sm={3} md={3} lg={2} xl={3}>
@@ -248,7 +301,7 @@ function App() {
           <CoinTextField
             size='small'
             id='txtFund'
-            label='Vốn gốc'
+            label='Vốn USDT'
             type='number'
             // InputLabelProps={{
             //   shrink: true,
@@ -309,116 +362,15 @@ function App() {
             Thêm
           </Button>
         </Grid>
-        <Grid item xs={2} sm={2} md={2} lg={2} xl={2}>
-          <Button
-            fullWidth
-            style={{
-              height: '39px',
-              background: '#2c732c',
-              color: 'rgb(222 222 222)',
-              fontWeight: 'bold',
-            }}
-            //className={classes.btnCoin}
-            variant='contained'
-            endIcon={
-              isUpdating ? (
-                <CircularProgress size={20} style={{ color: '#fff' }} />
-              ) : (
-                <SyncIcon />
-              )
-            }
-            onClick={async () => {
-              setIsUpdating(true);
-              setCountRefresh(process.env.REACT_APP_SYNC_PRICE_TIMEOUT / 1000);
-              dispatch(backupMarkets());
-              dispatch(
-                updateCoins(await getCoinsWithNewPrices(currentState.entities))
-              );
-              setIsUpdating(false);
-            }}
-          >
-            <CountDown countdown={countRefresh} />
-          </Button>
-        </Grid>
-        <Grid item xs={3} sm={3} md={3} lg={3} xl={3}>
-          <Switcher label='DCA' mode='on' sendMode={sendModeDCA} />
-        </Grid>
-        <Grid item xs={2} sm={3} md={3} lg={3} xl={3}>
-          <Switcher label='%' mode='on' sendMode={sendModePercent} />
-        </Grid>
-        <Grid item xs={2} sm={3} md={3} lg={3} xl={3}>
-          <Switcher
-            label='Giá'
-            mode={currentState.isShowPrice ? 'on' : 'off'}
-            sendMode={sendModePrice}
-          />
+        {/* Coin List Widget */}
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <CoinListWidget />
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <CoinList />
         </Grid>
-        <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
-          <Button
-            fullWidth
-            style={{
-              height: '39px',
-              background: '#2c732c',
-              color: 'rgb(222 222 222)',
-              fontWeight: 'bold',
-            }}
-            variant='contained'
-            startIcon={
-              isSavingOffline ? (
-                <CircularProgress size={20} style={{ color: '#fff' }} />
-              ) : (
-                <SaveIcon />
-              )
-            }
-            onClick={async () => {
-              var r = window.confirm(
-                'Dữ liệu chỉ lưu trên mỗi thiết bị/trình duyệt, sẽ mất khi xóa lịch sử duyệt web'
-              );
-              if (r === true) {
-                setIsSavingOffline(true);
-                setTimeout(() => {
-                  localStorage.setItem(
-                    'coins',
-                    JSON.stringify(currentState.entities)
-                  );
-                  setIsSavingOffline(false);
-                }, 500);
-              } else {
-                log('Cancel save offline feature');
-              }
-            }}
-          >
-            Save offline
-          </Button>
-        </Grid>
-        <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
-          <Button
-            fullWidth
-            style={{
-              height: '39px',
-              background: '#2c732c',
-              color: 'rgb(222 222 222)',
-              fontWeight: 'bold',
-            }}
-            variant='contained'
-            startIcon={
-              isSavingOnline ? (
-                <CircularProgress size={20} style={{ color: '#fff' }} />
-              ) : (
-                <BackupIcon />
-              )
-            }
-            onClick={async () => {
-              setIsSavingOnline(true);
-              alert('login please');
-              setIsSavingOnline(false);
-            }}
-          >
-            Save online
-          </Button>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <SaveButton />
         </Grid>
       </Grid>
     </div>

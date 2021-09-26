@@ -92,7 +92,7 @@ export default function CoinList() {
 
   const formatSymbolCoin = (symbol) => {
     if (symbol) {
-      console.log(symbol);
+      //console.log(symbol);
       if (symbol.length > 5) symbol = symbol.substring(0, 5) + '...';
       return symbol;
     }
@@ -111,12 +111,12 @@ export default function CoinList() {
     return name;
   };
 
-  const formatProfix = (profix, profixPercent) => {
+  const formatProfix = (profix, profixPercent, isSummary = false) => {
     return (
       <Typography
         style={{
           color: profix < 0 ? '#cc1a1a' : 'rgb(1 154 1)',
-          fontSize: '0.875rem',
+          fontSize: isSummary ? '0.875rem' : '1rem',
         }}
       >
         {trendingIcon(profix)}
@@ -139,17 +139,46 @@ export default function CoinList() {
       <Typography
         style={{
           color: price >= prevPrice ? '#019A01' : '#cc1a1a',
-          fontSize: '0.875rem',
+          fontSize: '1rem',
         }}
       >
         {trendingIconPrice(price, prevPrice)}{' '}
         {price < 1000
-          ? +price.toString().substring(0, 11)
+          ? //? +price.toString().substring(0, 11)
+            //+toPlainString(price).substring(0, 14)
+            (+toPlainString(price).substring(0, 14 ))
+              .toString()
+              .substring(0, 9)
           : formatOriginalFund(price).replace('$', '')}{' '}
         $
       </Typography>
     );
   };
+  function toPlainString(num) {
+    return ('' + +num).replace(
+      /(-?)(\d*)\.?(\d*)e([+-]\d+)/,
+      function (a, b, c, d, e) {
+        return e < 0
+          ? b + '0.' + Array(1 - e - c.length).join(0) + c + d
+          : b + c + d + Array(e - d.length + 1).join(0);
+      }
+    );
+  }
+  const formatPurchasePrice = (record) => {
+    let purchasePrice = record.of / record.q;
+    return (
+      <>
+        {(+toPlainString(purchasePrice).substring(0, 12))
+          .toString()
+          .substring(0, 9)}
+        <DeleteIcon
+          style={{ float: 'right', color: '#ab2828', cursor: 'pointer' }}
+          onClick={() => dispatch(removeCoin({ index: record.index }))}
+        />
+      </>
+    );
+  };
+
   const formatProfixPercent = (profixPercent) => {
     return currentState.isShowPercent ? (
       <>
@@ -223,8 +252,8 @@ export default function CoinList() {
         </ListItemAvatar>
         <CoinListItemText
           style={{ width: '25%' }}
-          primary={'Tổng vốn:'}
-          secondary={'Tổng ví:'}
+          primary={'Vốn:'}
+          secondary={'Ví:'}
         />
         {/* Total Original Fund & Total Current Fund */}
         <CoinListItemText
@@ -236,7 +265,7 @@ export default function CoinList() {
         <CoinListItemText
           style={{ width: '50%' }}
           primary={'Lãi cuối:'}
-          secondary={formatProfix(totalProfix, totalProfixPercent)}
+          secondary={formatProfix(totalProfix, totalProfixPercent, true)}
         />
       </ListItem>
     );
@@ -262,7 +291,7 @@ export default function CoinList() {
             </Avatar>
           </ListItemAvatar>
           <CoinListItemText
-            style={{ width: '25%' }}
+            style={{ width: '27%' }}
             primary={formatSymbolCoin(record.s)}
             secondary={formatNameCoin(record.n)}
           />
@@ -281,7 +310,11 @@ export default function CoinList() {
                 ? formatPrice(record)
                 : formatProfix(profix, profixPercent)
             }
-            secondary={formatCurentFund(record)}
+            secondary={
+              currentState.isShowPrice
+                ? formatPurchasePrice(record)
+                : formatCurentFund(record)
+            }
           />
           {/* <DeleteIcon color="secondary" /> */}
           {/* <ListItemSecondaryAction>

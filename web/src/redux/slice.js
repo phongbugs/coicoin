@@ -6,6 +6,7 @@ export const slice = createSlice({
     btnIsUpdating: false,
     isShowPrice: false,
     isShowPercent: true,
+    isDCAMode:true,
     prevMarkets: {},
     errorMessage: '',
     entities: [
@@ -118,6 +119,14 @@ export const slice = createSlice({
       ...state,
       entities: payload,
     }),
+    enableDCAMode: (state) => ({
+      ...state,
+      isDCAMode: true,
+    }),
+    disableDCAMode: (state) => ({
+      ...state,
+      isDCAMode: false,
+    }),
     showPrice: (state) => ({
       ...state,
       isShowPrice: true,
@@ -157,6 +166,8 @@ export const {
   removeCoin,
   updateCoins,
   getCoins,
+  enableDCAMode,
+  disableDCAMode,
   hidePrice,
   showPrice,
   hidePercent,
