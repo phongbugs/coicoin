@@ -8,14 +8,25 @@
 
 ### Added
 
+
 ### Fixed
 
 ### Change
+
+- Remove "save online" button
+- Remove refresh button and countdown
+- Remove pair text box
+- Re-design folder struct:
+  - screens :
+    - wallet
+    - analysis
+    - donate
 
 ## [0.0.1]
 
 **First release:**
 
+- Screen : <http://prntscr.com/1svyvcq> <http://prntscr.com/1svz667>
 - Wallet App
   - Wallet Screen
     - Add coin popup
