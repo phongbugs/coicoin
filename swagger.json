@@ -33,7 +33,7 @@
     "/user/login": {
       "post": {
         "tags": [
-          "COICOIN API"
+          "USER"
         ],
         "summary": "Login to White Labels Management site",
         "description": "Login white label management site",
@@ -73,7 +73,7 @@
     "/user/login/status": {
       "get": {
         "tags": [
-          "COICOIN API"
+          "USER"
         ],
         "summary": "Check has the user logged in yet",
         "parameters": [
@@ -105,7 +105,7 @@
     "/authentication/": {
       "post": {
         "tags": [
-          "COICOIN API"
+          "USER"
         ],
         "summary": "Authenticate to BORDER-PX1 site",
         "description": "Login COICOIN site by its account",
@@ -155,7 +155,7 @@
     "/authentication/status": {
       "get": {
         "tags": [
-          "COICOIN API"
+          "USER"
         ],
         "summary": "Check whether has cookie been expired yet",
         "description": "Check whether has cookie been expired yet",
@@ -187,7 +187,7 @@
     "/info/backendId/{serverIp}": {
       "post": {
         "tags": [
-          "COICOIN API"
+          "INFORMATION"
         ],
         "summary": "Create a backendId for browsing page to specific server",
         "parameters": [
@@ -227,7 +227,7 @@
     "/info/domain/{domainType}/{siteName}": {
       "get": {
         "tags": [
-          "COICOIN API"
+          "INFORMATION"
         ],
         "summary": "Get all domains name of site name",
         "parameters": [
@@ -274,7 +274,7 @@
     "/info/valid-domain/{client}/{domainType}/{whitelabelName}": {
       "get": {
         "tags": [
-          "COICOIN API"
+          "INFORMATION"
         ],
         "summary": "Get valid domain ip/name of whitelabel name",
         "parameters": [
@@ -320,7 +320,7 @@
     "/info/valid-domain/{client}/{domainType}": {
       "post": {
         "tags": [
-          "COICOIN API"
+          "INFORMATION"
         ],
         "summary": "Update valid domains",
         "description": "Update valid domains for each client and domain type",
@@ -378,7 +378,7 @@
     "/info/folder/": {
       "get": {
         "tags": [
-          "COICOIN API"
+          "INFORMATION"
         ],
         "summary": "Get folder by doman",
         "parameters": [
@@ -405,42 +405,180 @@
           }
         }
       }
+    },
+    "/statistics/binance-symbols": {
+      "get": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "security": [],
+        "summary": "Get all symbols coin and token of Binance",
+        "responses": {
+          "200": {
+            "description": "Get symbols successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceSymbols"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/cmc-symbols": {
+      "get": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "security": [],
+        "summary": "Get all symbols coin and token of Coinmarketcap",
+        "responses": {
+          "200": {
+            "description": "Get symbols successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceSymbols"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/outer-binance-symbols": {
+      "get": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "security": [],
+        "summary": "Get all symbols coin and token belong to Coinmarketcap and don't belong to Binance",
+        "responses": {
+          "200": {
+            "description": "Get symbols successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceSymbols"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/update-cmc-symbols-object-type": {
+      "post": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "summary": "Update CMC's latest symbols coin object type",
+        "description": "Update CMC's latest symbols coin object type\r\n {\"BTC\":\"bitcoin\",\"ETH\":\"ethereum\"}",
+        "requestBody": {
+          "description": "symbols = JSON.stringfy(cmc's data crypto currentcy)",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "symbols": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "symbols"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSymbolsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/update-cmc-symbols-array-type": {
+      "post": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "summary": "Update CMC's latest symbols coin array type",
+        "description": "Update CMC's latest symbols coin array type\r\n [\"BTC\",\"ETH\"]",
+        "requestBody": {
+          "description": "symbols = JSON.stringfy(cmc's data crypto currentcy)",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "symbols": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "symbols"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSymbolsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "FolderResponse": {
+      "UpdateSymbolsResponse": {
         "required": [
           "success"
         ],
         "properties": {
           "success": {
             "type": "boolean"
-          },
-          "path": {
-            "type": "string"
-          },
-          "modifiedDateOfBKFile": {
-            "type": "string"
           },
           "message": {
             "type": "string"
           }
         }
       },
-      "backendIdResponse": {
+      "BinanceSymbols": {
         "required": [
-          "success"
+          "quantity"
         ],
         "properties": {
-          "success": {
-            "type": "boolean"
+          "quantity": {
+            "type": "number"
           },
-          "backendId": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
+          "symbols":{
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["BTC", "ETH", "DBZ"]
           }
         }
       },
@@ -556,6 +694,19 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "JWT": {
+        "type": "apiKey",
+        "description": "Type into the textbox: Bearer {your JWT token}.",
+        "name": "Authorization",
+        "in": "header"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ]
 }

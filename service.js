@@ -51,6 +51,8 @@ async function syncExtraMarkets() {
 }
 
 async function initStatistics() {
+  global.ARRAY_SYMBOLS = [];
+  global.OBJECT_SYMBOLS = {};
   global.EXTRAMARTKETS = [];
   setTimeout(async () => {
     let outerBinanceSymbols = (
