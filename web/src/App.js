@@ -270,7 +270,7 @@ function App() {
   return (
     <div className={classes.root}>
       <Grid container spacing={1}>
-        <Grid item xs={12} sm={4} md={4} lg={2} xl={4}>
+        <Grid item xs={12} sm={4} md={3} lg={3} xl={3}>
           <CoinComboBox
             InputProps={{
               className: classes.input,
@@ -279,7 +279,7 @@ function App() {
             sendSymbol={sendSymbol}
           />
         </Grid>
-        <Grid item xs={4} sm={3} md={3} lg={2} xl={3}>
+        <Grid item xs={4} sm={4} md={3} lg={3} xl={3}>
           <CoinTextField
             size='small'
             id='txtQuantity'
@@ -297,7 +297,7 @@ function App() {
             onFocus={(e) => setQuantityCoin('')}
           />
         </Grid>
-        <Grid item xs={4} sm={3} md={3} lg={2} xl={3}>
+        <Grid item xs={4} sm={4} md={3} lg={3} xl={3}>
           <CoinTextField
             size='small'
             id='txtFund'
@@ -317,7 +317,7 @@ function App() {
             onFocus={(e) => setOriginalFund('')}
           />
         </Grid>
-        <Grid item xs={4} sm={12} md={12} lg={2} xl={3}>
+        <Grid item xs={4} sm={12} md={3} lg={3} xl={3}>
           <Button
             fullWidth
             style={{
