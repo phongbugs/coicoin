@@ -139,16 +139,14 @@ export default function CoinList() {
       <Typography
         style={{
           color: price >= prevPrice ? '#019A01' : '#cc1a1a',
-          fontSize: '1rem',
+          fontSize: '0.875rem',
         }}
       >
-        {trendingIconPrice(price, prevPrice)}{' '}
+        {/* {trendingIconPrice(price, prevPrice)}{' '} */}
         {price < 1000
           ? //? +price.toString().substring(0, 11)
             //+toPlainString(price).substring(0, 14)
-            (+toPlainString(price).substring(0, 14 ))
-              .toString()
-              .substring(0, 9)
+            (+toPlainString(price).substring(0, 14)).toString().substring(0, 9)
           : formatOriginalFund(price).replace('$', '')}{' '}
         $
       </Typography>
@@ -293,7 +291,11 @@ export default function CoinList() {
           <CoinListItemText
             style={{ width: '27%' }}
             primary={formatSymbolCoin(record.s)}
-            secondary={formatNameCoin(record.n)}
+            secondary={
+              currentState.isShowPrice
+                ? formatPrice(record)
+                : formatNameCoin(record.n)
+            }
           />
           {/* Quantity Coin & Original Fund */}
           <CoinListItemText
@@ -305,11 +307,7 @@ export default function CoinList() {
           {/* Percent Profix & Current Fund */}
           <CoinListItemText
             style={{ width: '50%' }}
-            primary={
-              currentState.isShowPrice
-                ? formatPrice(record)
-                : formatProfix(profix, profixPercent)
-            }
+            primary={formatProfix(profix, profixPercent)}
             secondary={
               currentState.isShowPrice
                 ? formatPurchasePrice(record)
