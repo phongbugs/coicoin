@@ -99,6 +99,7 @@ async function fetchPriceFrom3rdParty(market) {
   } catch (error) {
     log(market);
     log(error);
+    return 0;
   }
 }
 module.exports = { fetchPriceFrom3rdParty };
