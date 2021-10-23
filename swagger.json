@@ -427,13 +427,34 @@
         }
       }
     },
-    "/statistics/cmc-symbols": {
+    "/statistics/cmc-array-symbols": {
       "get": {
         "tags": [
           "STATISTICS"
         ],
         "security": [],
-        "summary": "Get all symbols coin and token of Coinmarketcap",
+        "summary": "Get all symbols coin and token of Coinmarketcap array type",
+        "responses": {
+          "200": {
+            "description": "Get symbols successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceSymbols"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/cmc-object-symbols": {
+      "get": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "security": [],
+        "summary": "Get all symbols coin and token of Coinmarketcap object type",
         "responses": {
           "200": {
             "description": "Get symbols successfully",

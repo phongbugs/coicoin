@@ -1,6 +1,7 @@
 const fetch = require('node-fetch'),
   log = console.log,
   fs = require('fs'),
+  FormData = require('form-data'),
   cfg = require('../config'),
   env = process.env.NODE_ENV || 'development';
 async function fetchLatestCoins(latestQuantityCoin) {
@@ -16,53 +17,62 @@ async function fetchLatestCoins(latestQuantityCoin) {
   );
   let cryptoCurrencyList = (await response.json()).data.cryptoCurrencyList;
 
+  // save to raw file
+  toRawJson({
+    data: cryptoCurrencyList,
+    destFile: './coin.data.raw.' + cryptoCurrencyList.length + '.json',
+  });
   // update-cmc-symbols-object-type
-  let urlO = cfg[env].localApiUrl + '/statistics/update-cmc-symbols-object-type';
-  log(urlO);
-  let symbolsO = JSON.stringify(mapToSymbolKeyName(cryptoCurrencyList));
-  log(symbolsO);
-  let responseApiO = await fetch(urlO, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      symbols: symbolsO,
-    }),
-  });
-  log(await responseApiO.text());
-   
+  //await updateObjectSymbols(cryptoCurrencyList);
+
   // update-cmc-symbols-array-type
-  let urlA = cfg[env].localApiUrl + '/statistics/update-cmc-symbols-array-type';
-  log(urlA);
-  let symbolsA = JSON.stringify(cryptoCurrencyList.map((coin) => coin.symbol));
-  log(symbolsA);
-  let responseApiA = await fetch(urlA, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      symbols: symbolsA,
-    }),
-  });
-  log(await responseApiA.text());
+  await updateArraySymbols(cryptoCurrencyList);
 
   // save to static file symbol coin API
-  toJson({
-    data: mapToSymbolKeyName(cryptoCurrencyList),
-    destFile: '../coin.map.key.symbol.value.name.js',
-  });
+  // toJson({
+  //   data: mapToSymbolKeyName(cryptoCurrencyList),
+  //   destFile: '../coin.map.key.symbol.value.name.js',
+  // });
 
   // save coin list combobox web app
-  toJson({
-    data: convertCoin(cryptoCurrencyList, 'array'),
-    isEs6Export: true,
-    destFile: '../web/src/data/coin.map.js',
-  });
+  // toJson({
+  //   data: convertCoin(cryptoCurrencyList, 'array'),
+  //   isEs6Export: true,
+  //   destFile: '../web/src/data/coin.map.js',
+  // });
 }
+// use form data for large json content
+let updateObjectSymbols = async (cryptoCurrencyList) => {
+  let url = cfg[env].localApiUrl + '/statistics/update-cmc-symbols-object-type';
+  log(url);
+  let symbols = JSON.stringify(mapToSymbolKeyName(cryptoCurrencyList));
+  const form = new FormData();
+  form.append('symbols', symbols);
+  let responseApi = await fetch(url, {
+    method: 'POST',
+    body: form,
+  });
+  log(await responseApi.text());
+};
+let updateArraySymbols = async (cryptoCurrencyList) => {
+  let url = cfg[env].localApiUrl + '/statistics/update-cmc-symbols-array-type';
+  log(url);
+  let symbols = JSON.stringify(cryptoCurrencyList.map((coin) => coin.symbol));
+  //log(symbols);
+  const form = new FormData();
+  form.append('symbols', symbols);
+  let responseApi = await fetch(url, {
+    method: 'POST',
+    body: form,
+  });
+  log(await responseApi.text());
+};
 
 let mapToSymbolKeyName = (cryptoCurrencyList) => {
   let coins = {};
   for (cryptoCurrency of cryptoCurrencyList)
     coins[cryptoCurrency.symbol] = cryptoCurrency.name
-      .replace(/[ .]/g, '-')
+      .replace(/[ .-]/g, '-')
       .toLowerCase();
   return coins;
 };
@@ -83,16 +93,35 @@ let convertCoin = (cryptoCurrencyList, returnType) => {
   return coins;
 };
 let toJson = ({ data, destFile, isEs6Export }, callback) => {
-  fs.writeFile(
-    './' + destFile,
-    `${isEs6Export ? 'export const Coins' : 'module.exports '} = ` +
+    fs.writeFile(
+      './' + destFile,
+      `${isEs6Export ? 'export const Coins' : 'module.exports '} = ` +
+        JSON.stringify(data, null, 0),
+      'utf8',
+      (err) =>
+        err
+          ? log(err)
+          : callback
+          ? callback(destFile)
+          : log('saved ' + destFile)
+    );
+  },
+  toRawJson = ({ data, destFile }) => {
+    fs.writeFile(
+      './' + destFile,
       JSON.stringify(data, null, 0),
-    'utf8',
-    (err) =>
-      err ? log(err) : callback ? callback(destFile) : log('saved ' + destFile)
-  );
-};
+      'utf8',
+      (err) => (err ? log(err) : log('saved ' + destFile))
+    );
+  };
 
+// convert to markets pairs as binance
+// {"BTCUSDT":55555, ETHUSDT:4444}
+// let mutateToMarkets = (cryptoCurrencyList) => {
+//   let markets = cryptoCurrencyList.map(currentcy => {
+//     let market = currentcy.symbol
+//   })
+// }
 (async () => {
   let latestQuantityCoin = process.argv[2];
   fetchLatestCoins(latestQuantityCoin);

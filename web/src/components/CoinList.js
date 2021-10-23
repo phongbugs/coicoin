@@ -48,31 +48,28 @@ export default function CoinList() {
   const formatOriginalFund = (fund) => {
     if (fund % 1 === 0)
       return (
-        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
-        ' $'
+        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '')
       );
-    return formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
+    return formatter.format(fund).replace('$', '').replace('.00', '');
   };
   const formatFund = (fund) => {
     if (fund % 1 === 0)
       return (
-        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
-        ' $'
+        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '')
       );
-    return formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
+    return formatter.format(fund).replace('$', '').replace('.00', '');
   };
 
   const formatCurentFund = (record) => {
     let fund = record.cf;
     if (fund % 1 === 0)
       fund =
-        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '') +
-        ' $';
+        formatter.format(fund.toFixed(2)).replace('$', '').replace('.00', '');
     else
-      fund = formatter.format(fund).replace('$', '').replace('.00', '') + ' $';
+      fund = formatter.format(fund).replace('$', '').replace('.00', '');
     return (
       <>
-        {fund}
+        ${fund}
         <DeleteIcon
           style={{ float: 'right', color: '#ab2828', cursor: 'pointer' }}
           onClick={() => dispatch(removeCoin({ index: record.index }))}
@@ -82,7 +79,8 @@ export default function CoinList() {
   };
 
   const formatQuantityCoin = (quantity) => {
-    if (quantity >= 1000000) quantity = (quantity / 1000000).toFixed(2) + 'M';
+    if (quantity >= 1000000000) quantity = formatFund((quantity / 1000000000)) + 'B';
+    else if (quantity >= 1000000) quantity = (quantity / 1000000).toFixed(2) + 'M';
     else if (quantity >= 100000) quantity = (quantity / 1000).toFixed(2) + 'K';
     else if (quantity < 1) quantity = quantity.toFixed(5);
     else
@@ -120,7 +118,7 @@ export default function CoinList() {
         }}
       >
         {trendingIcon(profix)}
-        {' ' + formatOriginalFund(Math.abs(profix)) + ' '}
+        {' $' + formatOriginalFund(Math.abs(profix)) + ' '}
         {formatProfixPercent(profixPercent)}
       </Typography>
     );
@@ -143,12 +141,11 @@ export default function CoinList() {
         }}
       >
         {/* {trendingIconPrice(price, prevPrice)}{' '} */}
-        {price < 1000
+        ${price < 1000
           ? //? +price.toString().substring(0, 11)
             //+toPlainString(price).substring(0, 14)
             (+toPlainString(price).substring(0, 14)).toString().substring(0, 9)
           : formatOriginalFund(price).replace('$', '')}{' '}
-        $
       </Typography>
     );
   };
@@ -256,8 +253,8 @@ export default function CoinList() {
         {/* Total Original Fund & Total Current Fund */}
         <CoinListItemText
           style={{ width: '30%' }}
-          primary={formatFund(totalOriginalFund)}
-          secondary={formatFund(totalCurrentFund)}
+          primary={'$' + formatFund(totalOriginalFund)}
+          secondary={'$' + formatFund(totalCurrentFund)}
         />
         {/* Total Profix & Total Profix Percent} */}
         <CoinListItemText
@@ -302,7 +299,7 @@ export default function CoinList() {
             style={{ width: '30%' }}
             //alignItems='flex-start'
             primary={formatQuantityCoin(record.q)}
-            secondary={formatOriginalFund(record.of)}
+            secondary={'$' +formatOriginalFund(record.of)}
           />
           {/* Percent Profix & Current Fund */}
           <CoinListItemText
@@ -311,7 +308,7 @@ export default function CoinList() {
             secondary={
               currentState.isShowPrice
                 ? formatPurchasePrice(record)
-                : formatCurentFund(record)
+                :formatCurentFund(record)
             }
           />
           {/* <DeleteIcon color="secondary" /> */}
