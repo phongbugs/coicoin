@@ -3,9 +3,9 @@ module.exports = {
   APISECRET: 'DUA3aKL7cKno5AYvGHdWvICzQfsTJMzz0PqOWnAF64BmaBUKiEwJwias9STGWFhO',
   development: {
     localApiUrl: 'http://localhost:9999',
-    TIMEOUT_SYNC_BNBMARKET: 10000,
-    TIMEOUT_SYNC_EXTRAMARKET: 10000,
-    TIMEOUT_START_INIT_SYMBOLS: 30000,
+    TIMEOUT_SYNC_BNBMARKET: 30000,
+    TIMEOUT_SYNC_EXTRAMARKET: 60000,
+    TIMEOUT_START_INIT_SYMBOLS: 10000,
   },
   production: {
     localApiUrl: 'https://coicoin.cc',
