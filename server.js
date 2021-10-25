@@ -94,8 +94,8 @@ function onListening() {
 
 let service = require('./service');
 service.initStatistics();
-service.syncBNBMarkets();
-service.syncExtraMarkets();
+//service.syncBNBMarkets();
+//service.syncExtraMarkets();
 
 //const io = require('socket.io')(http);
 //Whenever someone connects this gets executed

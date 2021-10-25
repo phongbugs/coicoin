@@ -1,6 +1,6 @@
 const log = console.log,
-  fetch = require('node-fetch'),
-  coins = require('./coin.map.key.symbol.value.name')
+  fetch = require('node-fetch');
+//coins = require('./coin.map.key.symbol.value.name')
 // ==> https://http-api.livecoinwatch.com
 // async function fetchPriceFrom3rdParty(market) {
 //   try {
@@ -78,7 +78,9 @@ const log = console.log,
 // ==> https://api.coinmarketcap.com
 async function fetchPriceFrom3rdParty(market) {
   let symbol = market.substring(0, market.length - 4);
-  let name = coins[symbol]
+  //log(symbol)
+  let name = global.OBJECT_SYMBOLS[symbol];
+  //log(name)
   try {
     let url =
       'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/market-pairs/latest?' +
@@ -87,18 +89,23 @@ async function fetchPriceFrom3rdParty(market) {
         limit: 20,
         slug: name,
       });
-    log(url);
+    //log(url);
     const response = await fetch(url);
     const data = (await response.json()).data;
+    //log(data)
     const marketPairs = data.marketPairs;
     let totalPriceAllMarketPairs = 0;
     marketPairs.forEach(({ price }) => (totalPriceAllMarketPairs += price));
     const avegarePrice = totalPriceAllMarketPairs / marketPairs.length;
-    log(avegarePrice)
+    //log(avegarePrice);
+    if (!global.EXTRAMARTKETS.includes(market))
+      global.EXTRAMARTKETS.push(market);
+    global.MARKETS[market] = avegarePrice;
     return avegarePrice;
   } catch (error) {
     log(market);
     log(error);
+    return 0;
   }
 }
 module.exports = { fetchPriceFrom3rdParty };

@@ -2,6 +2,7 @@ const log = console.log,
   fetch = require('node-fetch'),
   fetchPriceFrom3rdParty = require('../crawler.cmc').fetchPriceFrom3rdParty;
 
+// Use for add new coin/token
 async function fetchPrice(req, res) {
   let market = req.params.market;
   try {
@@ -16,6 +17,8 @@ async function fetchPrice(req, res) {
     throw error;
   }
 }
+
+// use for sync price of list coin/token
 async function fetchPrices(req, res) {
   try {
     let markets = req.params.markets.split(',');
@@ -26,6 +29,7 @@ async function fetchPrices(req, res) {
         else prices[market] = await fetchPriceFrom3rdParty(market);
       })
     ).then(() => {
+      //log(prices)
       res.send(prices);
     });
   } catch (error) {
@@ -58,7 +62,6 @@ function fetchBNBOuterMarkets(_, res) {
     res.send(error);
   }
 }
-
 
 module.exports = {
   fetchPrice,

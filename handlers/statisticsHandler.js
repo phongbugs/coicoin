@@ -7,16 +7,15 @@
  */
 const getAllMarkets = require('../crawler.binance').getAllMarkets,
   log = console.log,
-  fetch = require('node-fetch'),
-  fetchBinanceSymbolCoins = (callback) => {
+  fetchAllBinanceSymbolCoins = (callback) => {
     try {
       getAllMarkets((markets) => {
         //log(markets)
         var listBinanceSymbols = [];
         for (market in markets) {
-          let usdt = market.substr(market.length - 4, 4);
-          if (usdt === 'USDT') {
-            let coinSymbol = market.substring(0, market.length - 4);
+          let btc = market.substr(market.length - 3, 3);
+          if (btc === 'BTC') {
+            let coinSymbol = market.substring(0, market.length - 3);
             listBinanceSymbols.push(coinSymbol);
           }
         }
@@ -27,7 +26,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
       log(error);
     }
   },
-  fetchCoinmarketcapSymbolCoins = async () => {
+  fetchCMCArraySymbols = async () => {
     try {
       // const response = await fetch(
       //   'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?' +
@@ -45,20 +44,26 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
 
       // const data = require('../cmc.raw.js')
       // log(data)
-      const symbols = require('../cmc.raw.js').data.cryptoCurrencyList.map(
-        (coin) => coin.symbol
-      );
+      // const symbols = require('../cmc.raw.js').data.cryptoCurrencyList.map(
+      //   (coin) => coin.symbol
+      // );
       //log(symbols)
-      return symbols;
-      
+      return global.ARRAY_SYMBOLS;
     } catch (error) {
       log(error);
     }
   },
-  fetchOuterBinanceSymbols = (callback) => {
+  fetchCMCObjectSymbols = () => {
     try {
-      fetchBinanceSymbolCoins(async (binanceSymbols) => {
-        let cmcSymbols = await fetchCoinmarketcapSymbolCoins();
+      return global.OBJECT_SYMBOLS;
+    } catch (error) {
+      log(error);
+    }
+  },
+  fetchOuterSymbolsBinance = (callback) => {
+    try {
+      fetchAllBinanceSymbolCoins(async (binanceSymbols) => {
+        let cmcSymbols = await fetchCMCArraySymbols();
         //log(cmcSymbols)
         //https://medium.com/@alvaro.saburido/set-theory-for-arrays-in-es6-eb2f20a61848
         let outerBinanceSymbols = cmcSymbols.filter(
@@ -71,9 +76,9 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
       log(error);
     }
   },
-  getInfoBinance = async (_, res) => {
+  getBinanceSymbols = async (_, res) => {
     try {
-      fetchBinanceSymbolCoins((symbols) => {
+      fetchAllBinanceSymbolCoins((symbols) => {
         //log(symbols)
         res.send({ quantity: symbols.length, symbols: symbols });
       });
@@ -81,20 +86,52 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
       log(error);
     }
   },
-  getInfoCoinmarketcap = async (_, res) => {
-    let symbols = await fetchCoinmarketcapSymbolCoins();
+  getCMCArraySymbols = async (_, res) => {
+    let symbols = await fetchCMCArraySymbols();
     //log(symbols)
     res.send({ quantity: symbols.length, symbols: symbols });
   },
-  getInfoOuterBinance = (_, res) => {
-    fetchOuterBinanceSymbols((symbols) => {
+  getCMCObjectSymbols = async (_, res) => {
+    let symbols = fetchCMCObjectSymbols();
+    //log(symbols)
+    res.send({ quantity: Object.keys(symbols).length, symbols: symbols });
+  },
+  getOuterSymbolsBinance = (_, res) => {
+    fetchOuterSymbolsBinance((symbols) => {
       res.send({ quantity: symbols.length, symbols: symbols });
     });
+  },
+  /**
+   * OBJECT_SYMBOLS = {"BTC":"Bitcoin", "ETH":"Etherum"};
+   * ARRAY_SYMBOLS = ["BTC", "ETH"}];
+   */
+  updateObjectSymbols = (req, res) => {
+    try {
+      //log(req.headers);
+      //log(JSON.stringify(req.fields));
+      let symbols = JSON.parse(req.fields.symbols)
+      global.OBJECT_SYMBOLS = symbols;
+      res.send({ success: true, message: 'Object Symbols updated' });
+    } catch (error) {
+      log(error);
+      res.send({ success: false, message: error.message });
+    }
+  },
+  updateArraySymbols = (req, res) => {
+    try {
+      let symbols = JSON.parse(req.fields.symbols)
+      global.ARRAY_SYMBOLS = symbols;
+      res.send({ success: true, message: 'Array Symbols updated' });
+    } catch (error) {
+      res.send({ success: false, message: error.message });
+    }
   };
 
 module.exports = {
-  getInfoBinance,
-  getInfoCoinmarketcap,
-  getInfoOuterBinance, 
-  fetchOuterBinanceSymbols,
+  getBinanceSymbols,
+  getCMCObjectSymbols,
+  getCMCArraySymbols,
+  getOuterSymbolsBinance,
+  updateArraySymbols,
+  updateObjectSymbols,
 };
