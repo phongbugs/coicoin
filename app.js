@@ -8,8 +8,9 @@ var indexRouter = require('./routes/index');
 var infoRouter = require('./routes/info');
 var statisticsRouter = require('./routes/statistics');
 
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 var busboy = require('connect-busboy');
+const formidable = require('express-formidable');
 var app = express();
 
 const swaggerUi = require('swagger-ui-express');
@@ -21,16 +22,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json());
 app.use(busboy());
+app.use(formidable());
 
 app.use(function (req, res, next) {
   var allowedDomains = [
     'http://localhost:3000',
-    'http://192.168.2.185:3000',
     'http://localhost:5000',
-    'http://localhost:9999',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000',
+    'http://192.168.2.185:3000',
+    'http://192.168.2.185:5000',
     'https://coicoin.cc',
   ];
   var origin = req.headers.origin;
