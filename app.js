@@ -31,14 +31,19 @@ app.use(function (req, res, next) {
   var allowedDomains = [
     'http://localhost:3000',
     'http://localhost:5000',
+    'http://localhost:9999',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5000',
+    'http://127.0.0.1:9999',
     'http://192.168.2.185:3000',
     'http://192.168.2.185:5000',
+    'http://192.168.2.185:9999',
     'http://192.168.2.183:3000',
     'http://192.168.2.183:5000',
+    'http://192.168.2.183:9999',
     'http://192.168.2.134:5000',
     'http://192.168.2.134:3000',
+    'http://192.168.2.134:9999',
     'https://coicoin.cc',
   ];
   var origin = req.headers.origin;
