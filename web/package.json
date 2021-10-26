@@ -34,6 +34,7 @@
     "build": "react-scripts build",
     "build:dev": "dotenv -e .env.development react-scripts build",
     "build:prod": "dotenv -e .env.production react-scripts build",
+    "build:android": "dotenv -e .env.android react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
