@@ -7,7 +7,7 @@
 var app = require('./app');
 var debug = require('debug')('coicoin-api:server');
 var http = require('http');
-const io = require('socket.io')(http);
+
 
 /**
  * Get port from environment and store in Express.
@@ -97,12 +97,13 @@ service.initStatistics();
 //service.syncBNBMarkets();
 //service.syncExtraMarkets();
 
+//const io = require('socket.io')(http);
 //Whenever someone connects this gets executed
-io.on('connection', function (socket) {
-  console.log('A user connected');
+// io.on('connection', function (socket) {
+//   console.log('A user connected');
 
-  //Whenever someone disconnects this piece of code executed
-  socket.on('disconnect', function () {
-    console.log('A user disconnected');
-  });
-});
+//   //Whenever someone disconnects this piece of code executed
+//   socket.on('disconnect', function () {
+//     console.log('A user disconnected');
+//   });
+// });

@@ -15,7 +15,12 @@ async function syncBNBMarkets() {
       //log('Syncing BNBMARTKETS...');
       binanceCrawler.getAllMarkets((markets) => {
         global.MARKETS = markets;
-        log('==> Synced BNBMARTKETS...');
+        let d = new Date();
+        log(
+          '%s, %s Synced BNBMARTKETS',
+          d.toLocaleDateString(),
+          d.toLocaleTimeString()
+        );
       });
     }, TIMEOUT_SYNC_BNBMARKET);
   } catch (error) {
@@ -37,7 +42,12 @@ async function syncExtraMarkets() {
               ))
           )
         ).then(() => {
-          log('==> Synced EXTRAMARTKETS');
+          let d = new Date();
+          log(
+            '%s, %s Synced EXTRAMARTKETS',
+            d.toLocaleDateString(),
+            d.toLocaleTimeString()
+          );
         });
       } else {
         log('==> EXTRAMARTKETS NODATA');
