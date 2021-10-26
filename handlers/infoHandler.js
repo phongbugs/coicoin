@@ -29,7 +29,7 @@ async function fetchPrices(req, res) {
         else prices[market] = await fetchPriceFrom3rdParty(market);
       })
     ).then(() => {
-      log(prices)
+      //log(prices)
       res.send(prices);
     });
   } catch (error) {
@@ -62,7 +62,6 @@ function fetchBNBOuterMarkets(_, res) {
     res.send(error);
   }
 }
-
 
 module.exports = {
   fetchPrice,

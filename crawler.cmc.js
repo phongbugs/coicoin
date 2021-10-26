@@ -89,7 +89,7 @@ async function fetchPriceFrom3rdParty(market) {
         limit: 20,
         slug: name,
       });
-    log(url);
+    //log(url);
     const response = await fetch(url);
     const data = (await response.json()).data;
     //log(data)
