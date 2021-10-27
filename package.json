@@ -6,7 +6,8 @@
     "start-api": "node ./server.js",
     "start-web": "cd ./web  && yarn start",
     "start": "concurrently \"npm-run-all -p start-api start-web\"",
-    "build": "cd ./web && yarn build"
+    "sync-cmc-live": "set NODE_ENV=production&&cd utils && node syncCoins 9000",
+    "sync-cmc-local": "cd utils && node syncCoins 9000"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
