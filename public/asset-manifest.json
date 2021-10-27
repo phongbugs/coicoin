@@ -1,14 +1,8 @@
 {
   "files": {
-<<<<<<< HEAD
-    "main.css": "/static/css/main.06ed033e.chunk.css",
-    "main.js": "/static/js/main.17aed1a8.chunk.js",
-    "main.js.map": "/static/js/main.17aed1a8.chunk.js.map",
-=======
     "main.css": "/static/css/main.1c509707.chunk.css",
-    "main.js": "/static/js/main.7b51401e.chunk.js",
-    "main.js.map": "/static/js/main.7b51401e.chunk.js.map",
->>>>>>> live.android
+    "main.js": "/static/js/main.10e65e53.chunk.js",
+    "main.js.map": "/static/js/main.10e65e53.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.7c9c8089.js",
     "runtime-main.js.map": "/static/js/runtime-main.7c9c8089.js.map",
     "static/js/2.50d7d0c0.chunk.js": "/static/js/2.50d7d0c0.chunk.js",
@@ -24,14 +18,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.7c9c8089.js",
-<<<<<<< HEAD
-    "static/js/2.68ecfeba.chunk.js",
-    "static/css/main.06ed033e.chunk.css",
-    "static/js/main.17aed1a8.chunk.js"
-=======
     "static/js/2.50d7d0c0.chunk.js",
     "static/css/main.1c509707.chunk.css",
-    "static/js/main.7b51401e.chunk.js"
->>>>>>> live.android
+    "static/js/main.10e65e53.chunk.js"
   ]
 }
