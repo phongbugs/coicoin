@@ -469,6 +469,27 @@
         }
       }
     },
+    "/statistics/cmc-using-symbols": {
+      "get": {
+        "tags": [
+          "STATISTICS"
+        ],
+        "security": [],
+        "summary": "Get all symbols are using by user of Coinmarketcap",
+        "responses": {
+          "200": {
+            "description": "Get symbols successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinanceSymbols"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/statistics/outer-binance-symbols": {
       "get": {
         "tags": [
