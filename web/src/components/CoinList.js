@@ -12,7 +12,7 @@ import { removeCoin } from '../redux/slice';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
-import coinSummaryLogo from '../img/coinsummary.png';
+import coinSummaryLogo from '../img/fav.png';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',

@@ -96,6 +96,11 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
     //log(symbols)
     res.send({ quantity: Object.keys(symbols).length, symbols: symbols });
   },
+  getCMCUsingSymbols = (_, res) =>
+    res.send({
+      quantity: global.EXTRAMARTKETS.length,
+      symbols: global.EXTRAMARTKETS,
+    }),
   getOuterSymbolsBinance = (_, res) => {
     fetchOuterSymbolsBinance((symbols) => {
       res.send({ quantity: symbols.length, symbols: symbols });
@@ -109,7 +114,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
     try {
       //log(req.headers);
       //log(JSON.stringify(req.fields));
-      let symbols = JSON.parse(req.fields.symbols)
+      let symbols = JSON.parse(req.fields.symbols);
       global.OBJECT_SYMBOLS = symbols;
       res.send({ success: true, message: 'Object Symbols updated' });
     } catch (error) {
@@ -119,7 +124,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
   },
   updateArraySymbols = (req, res) => {
     try {
-      let symbols = JSON.parse(req.fields.symbols)
+      let symbols = JSON.parse(req.fields.symbols);
       global.ARRAY_SYMBOLS = symbols;
       res.send({ success: true, message: 'Array Symbols updated' });
     } catch (error) {
@@ -131,6 +136,7 @@ module.exports = {
   getBinanceSymbols,
   getCMCObjectSymbols,
   getCMCArraySymbols,
+  getCMCUsingSymbols,
   getOuterSymbolsBinance,
   updateArraySymbols,
   updateObjectSymbols,
