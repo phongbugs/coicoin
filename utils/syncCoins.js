@@ -5,42 +5,55 @@ const fetch = require('node-fetch'),
   cfg = require('../config'),
   env = process.env.NODE_ENV || 'development';
 async function fetchLatestCoins(latestQuantityCoin) {
-  const response = await fetch(
+  let url =
     'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?' +
-      new URLSearchParams({
-        start: 1,
-        limit: latestQuantityCoin || 2,
-        sortBy: 'market_cap',
-        sortType: 'desc',
-        convert: 'USD,BTC,ETH',
-      })
-  );
-  let cryptoCurrencyList = (await response.json()).data.cryptoCurrencyList;
+    new URLSearchParams({
+      start: 1,
+      limit: latestQuantityCoin || 2,
+      sortBy: 'market_cap',
+      sortType: 'desc',
+      convert: 'USD,BTC,ETH',
+    });
+  // 'https://api.coinmarketcap.com/data-api/v3/map/all?' +
+  // new URLSearchParams({
+  //   listing_status: 'active',
+  //   exchangeAux: 'is_active,status',
+  //   cryptoAux: 'is_active,status',
+  //   start: 1,
+  //   limit: latestQuantityCoin || 2,
+  // });
 
+  log(url);
+  const response = await fetch(url);
+  //old url
+  let cryptoCurrencyList = (await response.json()).data.cryptoCurrencyList;
+  // new url
+  //let cryptoCurrencyList = (await response.json()).data.exchangeMap;
   // save to raw file
   toRawJson({
     data: cryptoCurrencyList,
     destFile: './coin.data.raw.' + cryptoCurrencyList.length + '.json',
   });
-  // update-cmc-symbols-object-type
-  //await updateObjectSymbols(cryptoCurrencyList);
+  //update-cmc-symbols-object-type
+  await updateObjectSymbols(cryptoCurrencyList);
 
   // update-cmc-symbols-array-type
   await updateArraySymbols(cryptoCurrencyList);
 
   // save to static file symbol coin API
-  // toJson({
-  //   data: mapToSymbolKeyName(cryptoCurrencyList),
-  //   destFile: '../coin.map.key.symbol.value.name.js',
-  // });
+  toJson({
+    data: mapToSymbolKeyName(cryptoCurrencyList),
+    destFile: '../coin.map.key.symbol.value.name.js',
+  });
 
   // save coin list combobox web app
-  // toJson({
-  //   data: convertCoin(cryptoCurrencyList, 'array'),
-  //   isEs6Export: true,
-  //   destFile: '../web/src/data/coin.map.js',
-  // });
+  toJson({
+    data: convertCoin(cryptoCurrencyList, 'array'),
+    isEs6Export: true,
+    destFile: '../web/src/data/coin.map.js',
+  });
 }
+
 // use form data for large json content
 let updateObjectSymbols = async (cryptoCurrencyList) => {
   let url = cfg[env].localApiUrl + '/statistics/update-cmc-symbols-object-type';
