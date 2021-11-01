@@ -41,17 +41,17 @@ async function fetchLatestCoins(latestQuantityCoin) {
   await updateArraySymbols(cryptoCurrencyList);
 
   // save to static file symbol coin API
-  toJson({
-    data: mapToSymbolKeyName(cryptoCurrencyList),
-    destFile: '../coin.map.key.symbol.value.name.js',
-  });
+  // toJson({
+  //   data: mapToSymbolKeyName(cryptoCurrencyList),
+  //   destFile: '../coin.map.key.symbol.value.name.js',
+  // });
 
   // save coin list combobox web app
-  toJson({
-    data: convertCoin(cryptoCurrencyList, 'array'),
-    isEs6Export: true,
-    destFile: '../web/src/data/coin.map.js',
-  });
+  // toJson({
+  //   data: convertCoin(cryptoCurrencyList, 'array'),
+  //   isEs6Export: true,
+  //   destFile: '../web/src/data/coin.map.js',
+  // });
 }
 
 // use form data for large json content
