@@ -116,6 +116,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
       //log(JSON.stringify(req.fields));
       let symbols = JSON.parse(req.fields.symbols);
       global.OBJECT_SYMBOLS = symbols;
+      global.OBJECT_SYMBOLS['HE'] = 'heroes-and-empires';
       res.send({ success: true, message: 'Object Symbols updated' });
     } catch (error) {
       log(error);
