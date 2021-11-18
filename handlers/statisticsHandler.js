@@ -117,6 +117,7 @@ const getAllMarkets = require('../crawler.binance').getAllMarkets,
       let symbols = JSON.parse(req.fields.symbols);
       global.OBJECT_SYMBOLS = symbols;
       global.OBJECT_SYMBOLS['HE'] = 'heroes-and-empires';
+      global.OBJECT_SYMBOLS['GFLOKI'] = 'genshinflokiinu-token';
       res.send({ success: true, message: 'Object Symbols updated' });
     } catch (error) {
       log(error);
